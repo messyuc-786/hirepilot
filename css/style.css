@@ -5,15 +5,12 @@
 
 /* ---------- 1. DESIGN TOKENS ---------- */
 :root {
-  --bg:        #0B1220;   /* cockpit navy */
-  --panel:     #131C2E;   /* instrument housing */
-  --panel-2:   #1B2740;   /* raised surface */
-  --line:      #26344F;   /* hairline seams */
-  --amber:     #F5A623;   /* primary instrument glow */
-  --cyan:      #4ECDC4;   /* radar / positive */
-  --red:       #E5484D;   /* warning */
-  --text:      #E8EDF5;
-  --muted:     #7A8AA3;
+ --bg:        #1A2130;   /* lighter slate */
+  --panel:     #232C3D;   /* raised surface */
+  --panel-2:   #2E3849;   /* hover states */
+  --line:      #3D4759;   /* visible borders */
+  --text:      #F0F4FA;   /* brighter text */
+  --muted:     #9AA7BC;   /* readable secondary */
 
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
