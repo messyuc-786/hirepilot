@@ -1,0 +1,44 @@
+# ============================================
+# HirePilot AI — .gitignore
+# Anything listed here is never uploaded to GitHub.
+# ============================================
+
+# --- SECRETS (most important) ---
+# Never commit API keys. If one leaks into a public repo,
+# bots find it within minutes and run up charges on your account.
+.env
+.env.local
+.env.*.local
+secrets.json
+config.local.js
+
+# --- DEPENDENCIES ---
+node_modules/
+package-lock.json
+yarn.lock
+
+# --- BUILD OUTPUT ---
+dist/
+build/
+.cache/
+
+# --- EDITOR SETTINGS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OPERATING SYSTEM JUNK ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- LOGS ---
+*.log
+npm-debug.log*
+
+# --- PERSONAL TEST FILES ---
+# Do not commit your real resume to a public repo.
+my-resume.pdf
+test-resume.*
+/personal/

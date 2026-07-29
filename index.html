@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HirePilot AI — Career Flight Deck</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============ SIDEBAR NAV ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">HP</div>
+      <div class="brand-text">
+        <strong>HirePilot</strong>
+        <span>AI Flight Deck</span>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item active" data-view="dashboard">
+        <span class="nav-num">00</span> Dashboard
+      </button>
+      <button class="nav-item" data-view="resume">
+        <span class="nav-num">01</span> Resume Analyzer
+      </button>
+      <button class="nav-item" data-view="jd">
+        <span class="nav-num">02</span> JD Analyzer
+      </button>
+      <button class="nav-item" data-view="optimizer">
+        <span class="nav-num">03</span> Resume Optimizer
+      </button>
+      <button class="nav-item" data-view="linkedin">
+        <span class="nav-num">04</span> LinkedIn Optimizer
+      </button>
+      <button class="nav-item" data-view="cover">
+        <span class="nav-num">05</span> Cover Letter
+      </button>
+      <button class="nav-item" data-view="interview">
+        <span class="nav-num">06</span> Mock Interview
+      </button>
+      <button class="nav-item" data-view="gap">
+        <span class="nav-num">07</span> Career Gap
+      </button>
+      <button class="nav-item" data-view="recruiter">
+        <span class="nav-num">08</span> Recruiter View
+      </button>
+      <button class="nav-item" data-view="tracker">
+        <span class="nav-num">09</span> Job Tracker
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <button class="btn-ghost" id="settingsBtn">API Settings</button>
+      <div class="status" id="apiStatus">
+        <span class="dot"></span> Not connected
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN PANEL ============ -->
+  <main class="main">
+    <div id="views"></div>
+  </main>
+
+  <!-- ============ SETTINGS MODAL ============ -->
+  <div class="modal" id="settingsModal" hidden>
+    <div class="modal-box">
+      <h2>API Settings</h2>
+      <p class="muted">
+        HirePilot runs on <strong>Groq</strong> — a free AI API. Get a key at
+        <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a>
+        (no credit card needed).
+      </p>
+
+      <label for="apiKeyInput">Groq API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off">
+
+      <label for="modelSelect">Model</label>
+      <select id="modelSelect">
+        <option value="llama-3.3-70b-versatile">Llama 3.3 70B (best quality)</option>
+        <option value="llama-3.1-8b-instant">Llama 3.1 8B (fastest)</option>
+      </select>
+
+      <div class="notice">
+        Your key is stored only in this browser (localStorage). It is never sent
+        anywhere except directly to Groq. It is not in your GitHub repo.
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelSettings">Cancel</button>
+        <button class="btn" id="saveSettings">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TOAST ============ -->
+  <div class="toast" id="toast" hidden></div>
+
+  <!-- ============ SCRIPTS (order matters) ============ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/features.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
