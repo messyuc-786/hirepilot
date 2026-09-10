@@ -6,15 +6,21 @@ bundler, no framework, no `npm install`. Supabase (via CDN) handles accounts
 and the database; a Supabase Edge Function calls Groq server-side, so no
 user ever sees, enters, or stores an AI provider key.
 
+**Live:** https://messyuc-786.github.io/hirepilot/ (deploys automatically
+from `main` via GitHub Pages)
+
 ---
 
 ## What You Are Building
 
-Nine tools, reached through the hamburger menu, plus a compact Home screen:
+Nine standalone tools, reached through the hamburger menu, plus a compact
+Home screen — and **PreHired**, a guided journey through several of them at
+once for someone who just wants one application ready end to end.
 
 | Module | Feature | What it does |
 |---|---------|--------------|
 | — | Home | Your snapshot, quick actions, recent applications |
+| — | **PreHired** | Guided: CV → JD → auto match → one-click optimize → auto re-evaluate → Before/After → next steps |
 | 01 | Resume Analyzer | Skills, ATS score, grammar, missing keywords |
 | 02 | JD Analyzer | Extracts requirements, scores your match |
 | 03 | Resume Optimizer | Stronger bullets — never invents experience |
@@ -25,10 +31,11 @@ Nine tools, reached through the hamburger menu, plus a compact Home screen:
 | 08 | Recruiter View | What a recruiter notices, including red flags |
 | 09 | Job Tracker | Applications, rounds, follow-ups, outcomes |
 
-Users sign up, land on Home, and use any tool through the hamburger — no API
-key required for normal use once mock mode is off and a backend AI proxy is
-in place (see **Where This Still Falls Short of "Normal SaaS"** below; that
-last piece isn't built yet).
+Users sign up, land on Home, and either work through the hamburger's nine
+standalone tools individually, or hit the **PreHired** button on Home for a
+guided run through the core CV → JD → match → optimize pipeline (see
+**PreHired: The Guided Journey** below) — no API key required for normal use;
+AI calls route through a server-side proxy, never a key the user holds.
 
 ---
 
@@ -42,10 +49,13 @@ You need no tools installed for this step.
 hirepilot-ai/
 ├── index.html
 ├── .gitignore
+├── package.json            {"type":"commonjs"} only — no deps, no build step
 ├── README.md
 ├── css/
 │   └── style.css
 ├── img/                    the approved 3D visual assets
+├── test/
+│   └── gap-normalize.test.mjs   run with: node --test test/gap-normalize.test.mjs
 ├── supabase/
 │   ├── schema.sql          run this once in your Supabase project
 │   ├── README.md
@@ -54,7 +64,7 @@ hirepilot-ai/
 │           └── index.ts    server-side AI proxy — the only place
 │                            GROQ_API_KEY is ever read (as a secret)
 └── js/
-    ├── config.js            settings + AI_MODE toggle
+    ├── config.js            settings + AI_MODE toggle + AVAILABLE_MODELS
     ├── supabase-client.js   your Project URL + anon key go here
     ├── auth.js              sign up / log in / log out / reset
     ├── storage.js            localStorage read/write (unchanged API)
@@ -64,7 +74,10 @@ hirepilot-ai/
     ├── parser.js             pulls text out of PDFs
     ├── ui.js                 reusable interface pieces
     ├── auth-ui.js            login/signup/reset screens
-    ├── features.js           the nine tools + Home
+    ├── gap-normalize.js      Career Gap response normalization (unit-tested)
+    ├── ai-actions.js         the 3 AI calls shared by features.js + prehired.js
+    ├── features.js           the nine standalone tools + Home
+    ├── prehired.js           PreHired guided journey
     └── app.js                routing, drawer, auth gate — runs last
 ```
 
@@ -155,6 +168,40 @@ That's it — every signed-in user's live-mode requests now route through
 your function. Nobody pastes a key anywhere. The Settings screen (hamburger
 → AI Settings) only lets a user pick a preferred model; there's nothing
 else to configure.
+
+---
+
+## PreHired: The Guided Journey
+
+Nine standalone tools are flexible but require knowing which one to run next.
+**PreHired** (the prominent button on Home) chains the core pipeline
+automatically:
+
+```
+Add/select CV
+  → (auto) analyze it, if it's new — skipped if you picked an
+    already-analyzed resume, so this never re-runs unnecessarily
+  → Add a JD
+  → (auto) analyze the JD + calculate your match
+  → "Optimize my CV for this job" (one click — not automatic,
+    since it's an extra AI call the user should choose to spend)
+  → (auto) re-evaluate the optimized resume against the same JD
+  → Before vs. After score, what changed, remaining gaps
+  → "Your application is ready" → one-click into Cover Letter,
+    LinkedIn Optimizer, Mock Interview, or Job Tracker
+```
+
+It does not duplicate any AI logic: `js/ai-actions.js` holds the exact same
+resume-analysis / JD-match / optimizer prompts that Resume Analyzer, JD
+Analyzer, and Resume Optimizer already used — extracted into one shared
+place so both the standalone screens and PreHired call the identical code.
+It saves through the same `Storage.addResume`/`addApplication` calls those
+screens already use, so anything PreHired creates shows up normally in Job
+Tracker and in every other tool's dropdowns.
+
+Progress persists to `localStorage` after every step (survives a refresh or
+navigating away), and re-entering PreHired with the same resume + JD text
+skips re-running the AI calls entirely rather than spending quota twice.
 
 ---
 
@@ -274,8 +321,16 @@ network calls, zero auth required, for quota-free UI testing.
       Mock Interview, Career Gap, Recruiter View, Job Tracker all produce
       results with no console errors
 
+**PreHired**
+- [ ] Home → PreHired → paste/select CV → auto-analyzes → JD → auto-matches
+- [ ] "Optimize my CV for this job" auto re-evaluates and shows Before/After
+- [ ] Progress survives a hard refresh mid-flow
+- [ ] Re-entering with the same CV + JD makes no new AI calls (check Network)
+- [ ] One-click next steps land on Cover Letter/LinkedIn/Interview/Tracker
+      with the same resume and job already selected
+
 **Responsive**
-- [ ] No horizontal overflow at 1440/1280/1024/768/430/375px
+- [ ] No horizontal overflow at 1440/1280/1024/768/430/390/375px
 - [ ] Hamburger drawer opens/closes (X, backdrop click, ESC) at every size
 
 ### Browser console
@@ -283,12 +338,21 @@ network calls, zero auth required, for quota-free UI testing.
 Press **F12** → **Console**. Red text means an error worth chasing down —
 these are the ones that bite later if ignored.
 
+### Automated tests
+
+Pure-logic pieces (currently: Career Gap's response normalization) have a
+focused Node test suite — no framework, no install:
+
+```bash
+node --test test/gap-normalize.test.mjs
+```
+
 ---
 
 ## How the Code Is Organised
 
 ```
-config.js         Settings + AI_MODE (mock/live) toggle.
+config.js         Settings + AI_MODE (mock/live) toggle + AVAILABLE_MODELS.
 supabase-client.js  Your Project URL + anon key. Nothing else.
 auth.js            Sign up / log in / log out / reset — wraps Supabase Auth.
 storage.js         localStorage read/write. Public API never changes.
@@ -298,7 +362,14 @@ api.js             Talks to Groq, or returns mock-ai.js's response.
 parser.js          Pulls text out of PDFs.
 ui.js              Reusable interface pieces (panels, tags, score bars...).
 auth-ui.js         Login / signup / reset-password screens.
-features.js        The nine tools + Home. Each has render() + run().
+gap-normalize.js   Coerces Career Gap's AI response into safe display shapes
+                    (never "[object Object]") — DOM-free, unit-tested.
+ai-actions.js      The resume/JD-match/optimizer AI calls, shared by
+                    features.js and prehired.js so the prompts exist once.
+features.js        The nine standalone tools + Home. Each has render() + run().
+prehired.js        The guided PreHired journey — calls ai-actions.js,
+                    saves through the same Storage.add* calls the
+                    standalone screens use.
 app.js             Routing, the nav drawer, and the auth gate. Runs last.
 ```
 
@@ -350,6 +421,14 @@ Confirm you're signed into the *same* account, and that
 show `resumes`, `applications`, `job_analyses`, `interviews`, etc. with a
 padlock icon next to each, meaning RLS is on).
 
+**"Request failed (404). The model ... does not exist"**
+Your browser has an old model id cached from before a Groq catalog change
+(`js/storage.js`'s `Storage.getModel()` validates against
+`CONFIG.AVAILABLE_MODELS` and self-heals this automatically as of the fix in
+commit `9f94b02` — hard refresh to pick that code up if you're still seeing
+this). If it persists after a hard refresh in a private window, it's a
+Groq-side issue (key, quota) rather than a model-name issue.
+
 **"Network error" / CORS error in live mode**
 The Edge Function isn't deployed yet, or `GROQ_API_KEY` hasn't been set as
 a secret — see Step 4. Use mock mode (`?aimode=mock`) in the meantime.
@@ -378,7 +457,7 @@ reloads.
    screens are display-only today; `schema.sql` already has
    `career_gaps`/`linkedin_reviews`/`cover_letters` tables ready for when
    that's built.
-5. **Email reminders** — follow-up nudges on stale applications.
+4. **Email reminders** — follow-up nudges on stale applications.
 
 ---
 
