@@ -54,11 +54,15 @@ const App = {
     this.bindSettings();
     this.updateStatus();
 
+    const mock = Config.aiMode() === 'mock';
+    document.getElementById('mockBadge').hidden = !mock;
+
     // Show the dashboard first.
     this.go('dashboard');
 
-    // Nudge first-time users toward setting up their key.
-    if (!Storage.hasApiKey()) {
+    // Nudge first-time users toward setting up their key — only
+    // relevant in live mode. Mock mode needs no key at all.
+    if (!mock && !Storage.hasApiKey()) {
       setTimeout(() => {
         UI.toast('Add your free Groq API key to get started — open the menu and choose API Settings.');
       }, 700);

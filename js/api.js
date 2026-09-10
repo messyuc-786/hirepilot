@@ -18,6 +18,13 @@ const API = {
      user:   the actual content to analyse
      ------------------------------------------------------------ */
   async ask(system, user) {
+    // Mock mode: no network call, no key, no quota spent. See
+    // config.js (CONFIG.AI_MODE / Config.aiMode()) and mock-ai.js.
+    if (Config.aiMode() === 'mock') {
+      await new Promise(r => setTimeout(r, 350)); // feels like a real call, for loading-state QA
+      return MockAI.respond(system);
+    }
+
     const key = Storage.getApiKey();
 
     if (!key) {

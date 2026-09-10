@@ -118,6 +118,20 @@ img { display: block; max-width: 100%; }
 .status.live .dot { background: var(--green); }
 .status.live { color: var(--green); }
 
+/* Only ever visible when Config.aiMode() === 'mock' — a deliberate,
+   loud reminder that responses are simulated, so this never gets
+   mistaken for a live result during development. */
+.mock-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  color: var(--amber);
+  background: #FFF7ED;
+  border: 1px solid #FDE7C7;
+  padding: 4px 9px;
+  border-radius: 20px;
+}
+
 /* Hamburger — three bars that morph into an X when the drawer opens */
 .hamburger {
   width: 42px; height: 42px;

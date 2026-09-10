@@ -5,6 +5,23 @@
 
 const CONFIG = {
 
+  // ---- AI MODE ----
+  // 'live' — real calls to the AI provider (today: client-side Groq,
+  //          same as before this flag existed). This is the
+  //          deployed/production default — real users always get
+  //          real analysis.
+  // 'mock' — every AI call returns a deterministic canned response
+  //          from mock-ai.js instead. No network call, no API key
+  //          needed, no quota spent. This is what UI/UX/navigation/
+  //          responsive QA should run under — never repeatedly hit
+  //          the real API just to check a layout.
+  // This is the static-site equivalent of a VITE_AI_MODE build-time
+  // flag: there's no bundler here, so this value IS the "build-time"
+  // setting for a given deployment. Config.aiMode() (below) layers a
+  // localStorage/URL override on top, for flipping modes
+  // interactively during development without editing this file.
+  AI_MODE: 'live',
+
   // ---- AI PROVIDER ----
   // Groq is free, needs no credit card, and is very fast.
   // Get a key at https://console.groq.com
@@ -50,3 +67,27 @@ if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
+
+/* ------------------------------------------------------------
+   Config.aiMode() — resolves the effective AI mode for this page
+   load: CONFIG.AI_MODE, overridable for development only via
+   ?aimode=mock|live in the URL (sticky — saved to localStorage so
+   it survives navigating between screens) or by setting
+   localStorage.hirepilot_ai_mode directly in the console. Neither
+   override does anything in a context where you haven't
+   deliberately set one — normal users always get CONFIG.AI_MODE.
+   ------------------------------------------------------------ */
+const Config = {
+  aiMode() {
+    try {
+      const url = new URLSearchParams(location.search).get('aimode');
+      if (url === 'mock' || url === 'live') {
+        localStorage.setItem('hirepilot_ai_mode', url);
+        return url;
+      }
+      const stored = localStorage.getItem('hirepilot_ai_mode');
+      if (stored === 'mock' || stored === 'live') return stored;
+    } catch { /* localStorage unavailable (private mode, etc.) — fall through */ }
+    return CONFIG.AI_MODE;
+  },
+};
