@@ -29,9 +29,42 @@ const Features = {
 dashboard() {
   const s = Storage.getStats();
   const apps = Storage.getApplications().slice(0, 5);
+  const isNew = s.resumes === 0 && s.applications === 0;
 
   UI.render(`
-    ${UI.head('Flight Deck', 'Dashboard', 'Your job search at a glance.')}
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="hero-eyebrow">Same You. New Possibilities. <span>A Brighter Tomorrow.</span></div>
+          <h1>Your Next Career Move<br><span class="accent">Starts Here.</span></h1>
+          <p>Analyze. Improve. Prepare. Apply smarter. All in one place, with the power of AI.</p>
+          <button class="btn btn-lg" id="heroGetStarted">Get Started &rarr;</button>
+          <div class="hero-fine">It's free to begin. No credit card required.</div>
+        </div>
+        <div class="hero-visual">
+          <img src="img/01_hero_homepage.jpg" alt="HirePilot: plan, prepare, and get hired with AI-powered career tools" loading="lazy">
+        </div>
+      </div>
+
+      <div class="hero-strip">
+        <div class="hero-strip-item">
+          ${UI.icon('doc')}
+          <div><strong>AI-Powered Tools</strong><span>Resume, JD, cover letter &amp; more</span></div>
+        </div>
+        <div class="hero-strip-item">
+          ${UI.icon('bars')}
+          <div><strong>Real-World Insights</strong><span>Role fit, skills gap, interview prep</span></div>
+        </div>
+        <div class="hero-strip-item">
+          ${UI.icon('user')}
+          <div><strong>For Every Career Stage</strong><span>Students, professionals, career switchers</span></div>
+        </div>
+        <div class="hero-strip-item">
+          ${UI.icon('bolt')}
+          <div><strong>Built for Your Next Step</strong><span>Plan. Prepare. Get Hired.</span></div>
+        </div>
+      </div>
+    </section>
 
     <div class="grid grid-4" style="margin-bottom:18px">
       ${UI.stat('Resumes', s.resumes)}
@@ -70,7 +103,7 @@ dashboard() {
             <tr>
               <td>${UI.escape(a.jobTitle || 'Untitled')}</td>
               <td>${UI.escape(a.company || '—')}</td>
-              <td style="font-family:var(--mono);color:var(--amber)">
+              <td style="font-family:var(--mono);color:var(--navy)">
                 ${a.matchScore != null ? a.matchScore + '%' : '—'}
               </td>
               <td><span class="badge ${a.status}">${a.status}</span></td>
@@ -78,7 +111,27 @@ dashboard() {
         </tbody>
       </table>
     ` : UI.empty('Nothing tracked yet. Analyze a job description to add your first application.'))}
+
+    <div class="grid grid-2">
+      <div class="promo-card">
+        <img src="img/11_about_journey.jpg" alt="Different paths, brighter tomorrows — HirePilot is with you" loading="lazy">
+        <div class="promo-body">
+          <strong>Different Paths. Brighter Tomorrows.</strong>
+          <span>HirePilot is with you at every career stage.</span>
+        </div>
+      </div>
+      <div class="promo-card">
+        <img src="img/12_motivational.jpg" alt="Small steps, big opportunities" loading="lazy">
+        <div class="promo-body">
+          <strong>Small Steps, Big Opportunities</strong>
+          <span>Plan. Prepare. Practice. Progress.</span>
+        </div>
+      </div>
+    </div>
   `);
+
+  document.getElementById('heroGetStarted')
+    ?.addEventListener('click', () => App.go(isNew ? 'resume' : 'jd'));
 },
 
 
@@ -93,14 +146,17 @@ resume() {
     ${UI.head('Module 01', 'Resume Analyzer',
       'Upload your resume for a full breakdown: skills, ATS compatibility, and gaps.')}
 
-    ${UI.panel('Upload', `
-      ${UI.drop('resumeFile')}
-      <label for="resumeText">Or paste your resume text</label>
-      <textarea id="resumeText" placeholder="Paste the full text of your resume..."></textarea>
-      <div class="btn-row">
-        <button class="btn" id="analyzeBtn">Analyze Resume</button>
-      </div>
-    `)}
+    <div class="split" style="margin-bottom:18px">
+      ${UI.panel('Upload', `
+        ${UI.drop('resumeFile')}
+        <label for="resumeText">Or paste your resume text</label>
+        <textarea id="resumeText" placeholder="Paste the full text of your resume..."></textarea>
+        <div class="btn-row">
+          <button class="btn" id="analyzeBtn">Analyze Resume</button>
+        </div>
+      `)}
+      ${UI.visual('img/02_resume_analysis.jpg', 'A resume analysis in progress, with a green "Great Start!" check', 'Skills, ATS score, grammar, and missing keywords — in one pass.')}
+    </div>
 
     <div id="resumeResult"></div>
 
@@ -244,34 +300,37 @@ jd() {
     ${UI.head('Module 02', 'Job Description Analyzer',
       'Break down what a job actually asks for, and how well you match it.')}
 
-    ${!resumes.length ? UI.panel('', UI.empty(
-      'Analyze a resume first (Module 01). The match score needs something to compare against.'
-    )) : UI.panel('Job Description', `
-      <label for="jdResume">Compare against</label>
-      <select id="jdResume">
-        ${resumes.map(r =>
-          `<option value="${r.id}">${UI.escape(r.name)} — ${UI.date(r.createdAt)}</option>`
-        ).join('')}
-      </select>
+    <div class="split" style="margin-bottom:18px">
+      ${!resumes.length ? UI.panel('', UI.empty(
+        'Analyze a resume first (Module 01). The match score needs something to compare against.'
+      )) : UI.panel('Job Description', `
+        <label for="jdResume">Compare against</label>
+        <select id="jdResume">
+          ${resumes.map(r =>
+            `<option value="${r.id}">${UI.escape(r.name)} — ${UI.date(r.createdAt)}</option>`
+          ).join('')}
+        </select>
 
-      <div class="grid grid-2" style="margin-top:4px">
-        <div>
-          <label for="jdTitle">Job Title</label>
-          <input type="text" id="jdTitle" placeholder="Senior Backend Engineer">
+        <div class="grid grid-2" style="margin-top:4px">
+          <div>
+            <label for="jdTitle">Job Title</label>
+            <input type="text" id="jdTitle" placeholder="Senior Backend Engineer">
+          </div>
+          <div>
+            <label for="jdCompany">Company</label>
+            <input type="text" id="jdCompany" placeholder="Acme Corp">
+          </div>
         </div>
-        <div>
-          <label for="jdCompany">Company</label>
-          <input type="text" id="jdCompany" placeholder="Acme Corp">
+
+        <label for="jdText">Job Description</label>
+        <textarea id="jdText" placeholder="Paste the full job posting here..."></textarea>
+
+        <div class="btn-row">
+          <button class="btn" id="jdBtn">Analyze & Match</button>
         </div>
-      </div>
-
-      <label for="jdText">Job Description</label>
-      <textarea id="jdText" placeholder="Paste the full job posting here..."></textarea>
-
-      <div class="btn-row">
-        <button class="btn" id="jdBtn">Analyze & Match</button>
-      </div>
-    `)}
+      `)}
+      ${UI.visual('img/03_jd_analysis.jpg', 'Finding your match against a job description', 'See required vs. preferred skills, and exactly what you\'re missing.')}
+    </div>
 
     <div id="jdResult"></div>
   `);
@@ -383,26 +442,29 @@ optimizer() {
       </div>
     `)}
 
-    ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
-      'You need one analyzed resume (Module 01) and one job description (Module 02) first.'
-    )) : UI.panel('Optimize', `
-      <label for="optResume">Resume</label>
-      <select id="optResume">
-        ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
-      </select>
+    <div class="split" style="margin-bottom:18px">
+      ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
+        'You need one analyzed resume (Module 01) and one job description (Module 02) first.'
+      )) : UI.panel('Optimize', `
+        <label for="optResume">Resume</label>
+        <select id="optResume">
+          ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
+        </select>
 
-      <label for="optJob">Target job</label>
-      <select id="optJob">
-        ${apps.map(a => `
-          <option value="${a.id}">
-            ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
-          </option>`).join('')}
-      </select>
+        <label for="optJob">Target job</label>
+        <select id="optJob">
+          ${apps.map(a => `
+            <option value="${a.id}">
+              ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
+            </option>`).join('')}
+        </select>
 
-      <div class="btn-row">
-        <button class="btn" id="optBtn">Generate Optimized Version</button>
-      </div>
-    `)}
+        <div class="btn-row">
+          <button class="btn" id="optBtn">Generate Optimized Version</button>
+        </div>
+      `)}
+      ${UI.visual('img/04_resume_optimizer.jpg', 'A resume optimized for more impact, ATS-friendly keywords, and visibility', 'Stronger bullets, better keywords — never invented experience.')}
+    </div>
 
     <div id="optResult"></div>
   `);
@@ -491,29 +553,32 @@ linkedin() {
     ${UI.head('Module 04', 'LinkedIn Optimizer',
       'Make your profile findable by recruiters searching for your skills.')}
 
-    ${UI.panel('Your Profile', `
-      <p class="muted" style="margin-bottom:14px">
-        Copy your headline, About section, and experience descriptions from
-        LinkedIn and paste them below.
-      </p>
+    <div class="split" style="margin-bottom:18px">
+      ${UI.panel('Your Profile', `
+        <p class="muted" style="margin-bottom:14px">
+          Copy your headline, About section, and experience descriptions from
+          LinkedIn and paste them below.
+        </p>
 
-      <label for="liText">Profile content</label>
-      <textarea id="liText" placeholder="Headline: ...&#10;&#10;About: ...&#10;&#10;Experience: ..."></textarea>
+        <label for="liText">Profile content</label>
+        <textarea id="liText" placeholder="Headline: ...&#10;&#10;About: ...&#10;&#10;Experience: ..."></textarea>
 
-      ${apps.length ? `
-        <label for="liJob">Optionally target a specific job</label>
-        <select id="liJob">
-          <option value="">General optimization</option>
-          ${apps.map(a => `
-            <option value="${a.id}">
-              ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
-            </option>`).join('')}
-        </select>` : ''}
+        ${apps.length ? `
+          <label for="liJob">Optionally target a specific job</label>
+          <select id="liJob">
+            <option value="">General optimization</option>
+            ${apps.map(a => `
+              <option value="${a.id}">
+                ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
+              </option>`).join('')}
+          </select>` : ''}
 
-      <div class="btn-row">
-        <button class="btn" id="liBtn">Optimize Profile</button>
-      </div>
-    `)}
+        <div class="btn-row">
+          <button class="btn" id="liBtn">Optimize Profile</button>
+        </div>
+      `)}
+      ${UI.visual('img/05_linkedin_optimizer.jpg', 'Standing out on LinkedIn with a stronger profile and headlines', 'Better headlines, stronger profile, more recruiter visibility.')}
+    </div>
 
     <div id="liResult"></div>
   `);
@@ -606,34 +671,37 @@ cover() {
     ${UI.head('Module 05', 'Cover Letter Generator',
       'A letter built from your real background and this specific job.')}
 
-    ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
-      'You need one analyzed resume and one job description first.'
-    )) : UI.panel('Generate', `
-      <label for="clResume">Resume</label>
-      <select id="clResume">
-        ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
-      </select>
+    <div class="split" style="margin-bottom:18px">
+      ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
+        'You need one analyzed resume and one job description first.'
+      )) : UI.panel('Generate', `
+        <label for="clResume">Resume</label>
+        <select id="clResume">
+          ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
+        </select>
 
-      <label for="clJob">Job</label>
-      <select id="clJob">
-        ${apps.map(a => `
-          <option value="${a.id}">
-            ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
-          </option>`).join('')}
-      </select>
+        <label for="clJob">Job</label>
+        <select id="clJob">
+          ${apps.map(a => `
+            <option value="${a.id}">
+              ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
+            </option>`).join('')}
+        </select>
 
-      <label for="clTone">Tone</label>
-      <select id="clTone">
-        <option value="professional">Professional</option>
-        <option value="conversational">Conversational</option>
-        <option value="enthusiastic">Enthusiastic</option>
-        <option value="concise">Concise and direct</option>
-      </select>
+        <label for="clTone">Tone</label>
+        <select id="clTone">
+          <option value="professional">Professional</option>
+          <option value="conversational">Conversational</option>
+          <option value="enthusiastic">Enthusiastic</option>
+          <option value="concise">Concise and direct</option>
+        </select>
 
-      <div class="btn-row">
-        <button class="btn" id="clBtn">Write Cover Letter</button>
-      </div>
-    `)}
+        <div class="btn-row">
+          <button class="btn" id="clBtn">Write Cover Letter</button>
+        </div>
+      `)}
+      ${UI.visual('img/06_cover_letter.jpg', 'Writing a personalized, professional, impactful cover letter', 'Personalized to one specific role — never generic.')}
+    </div>
 
     <div id="clResult"></div>
   `);
@@ -717,34 +785,37 @@ interview() {
     ${UI.head('Module 06', 'Mock Interview',
       'Practice with questions built from your actual resume and target job.')}
 
-    ${!resumes.length ? UI.panel('', UI.empty(
-      'Analyze a resume first so the questions can be based on your background.'
-    )) : UI.panel('Set Up', `
-      <label for="ivResume">Resume</label>
-      <select id="ivResume">
-        ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
-      </select>
+    <div class="split" style="margin-bottom:18px">
+      ${!resumes.length ? UI.panel('', UI.empty(
+        'Analyze a resume first so the questions can be based on your background.'
+      )) : UI.panel('Set Up', `
+        <label for="ivResume">Resume</label>
+        <select id="ivResume">
+          ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
+        </select>
 
-      ${apps.length ? `
-        <label for="ivJob">Target job (optional)</label>
-        <select id="ivJob">
-          <option value="">General interview</option>
-          ${apps.map(a => `
-            <option value="${a.id}">
-              ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
-            </option>`).join('')}
-        </select>` : ''}
+        ${apps.length ? `
+          <label for="ivJob">Target job (optional)</label>
+          <select id="ivJob">
+            <option value="">General interview</option>
+            ${apps.map(a => `
+              <option value="${a.id}">
+                ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
+              </option>`).join('')}
+          </select>` : ''}
 
-      <label for="ivType">Interview type</label>
-      <select id="ivType">
-        ${CONFIG.INTERVIEW_TYPES.map(t =>
-          `<option value="${t.id}">${t.label}</option>`).join('')}
-      </select>
+        <label for="ivType">Interview type</label>
+        <select id="ivType">
+          ${CONFIG.INTERVIEW_TYPES.map(t =>
+            `<option value="${t.id}">${t.label}</option>`).join('')}
+        </select>
 
-      <div class="btn-row">
-        <button class="btn" id="ivStart">Start Interview</button>
-      </div>
-    `)}
+        <div class="btn-row">
+          <button class="btn" id="ivStart">Start Interview</button>
+        </div>
+      `)}
+      ${UI.visual('img/07_mock_interview.jpg', 'Practicing a mock interview to build confidence', 'Practice, get feedback, build confidence — before it counts.')}
+    </div>
 
     <div id="ivArea"></div>
 
@@ -966,26 +1037,29 @@ gap() {
     ${UI.head('Module 07', 'Career Gap Analysis',
       'What stands between you and the role you want, and how to close it.')}
 
-    ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
-      'You need one analyzed resume and one job description first.'
-    )) : UI.panel('Analyze', `
-      <label for="gapResume">Resume</label>
-      <select id="gapResume">
-        ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
-      </select>
+    <div class="split" style="margin-bottom:18px">
+      ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
+        'You need one analyzed resume and one job description first.'
+      )) : UI.panel('Analyze', `
+        <label for="gapResume">Resume</label>
+        <select id="gapResume">
+          ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
+        </select>
 
-      <label for="gapJob">Target role</label>
-      <select id="gapJob">
-        ${apps.map(a => `
-          <option value="${a.id}">
-            ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
-          </option>`).join('')}
-      </select>
+        <label for="gapJob">Target role</label>
+        <select id="gapJob">
+          ${apps.map(a => `
+            <option value="${a.id}">
+              ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
+            </option>`).join('')}
+        </select>
 
-      <div class="btn-row">
-        <button class="btn" id="gapBtn">Analyze Gap</button>
-      </div>
-    `)}
+        <div class="btn-row">
+          <button class="btn" id="gapBtn">Analyze Gap</button>
+        </div>
+      `)}
+      ${UI.visual('img/08_career_gap.jpg', 'Explaining a career gap and reframing it as growth', 'Explain. Reframe. Show growth — with a realistic roadmap.')}
+    </div>
 
     <div id="gapResult"></div>
   `);
@@ -1079,27 +1153,30 @@ recruiter() {
     ${UI.head('Module 08', 'Recruiter View',
       'What a recruiter notices in the first thirty seconds, including the things you would rather they did not.')}
 
-    ${!resumes.length ? UI.panel('', UI.empty('Analyze a resume first.'))
-      : UI.panel('Analyze', `
-      <label for="recResume">Resume</label>
-      <select id="recResume">
-        ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
-      </select>
+    <div class="split" style="margin-bottom:18px">
+      ${!resumes.length ? UI.panel('', UI.empty('Analyze a resume first.'))
+        : UI.panel('Analyze', `
+        <label for="recResume">Resume</label>
+        <select id="recResume">
+          ${resumes.map(r => `<option value="${r.id}">${UI.escape(r.name)}</option>`).join('')}
+        </select>
 
-      ${apps.length ? `
-        <label for="recJob">Reviewing for (optional)</label>
-        <select id="recJob">
-          <option value="">General review</option>
-          ${apps.map(a => `
-            <option value="${a.id}">
-              ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
-            </option>`).join('')}
-        </select>` : ''}
+        ${apps.length ? `
+          <label for="recJob">Reviewing for (optional)</label>
+          <select id="recJob">
+            <option value="">General review</option>
+            ${apps.map(a => `
+              <option value="${a.id}">
+                ${UI.escape(a.jobTitle)} — ${UI.escape(a.company)}
+              </option>`).join('')}
+          </select>` : ''}
 
-      <div class="btn-row">
-        <button class="btn" id="recBtn">See Recruiter View</button>
-      </div>
-    `)}
+        <div class="btn-row">
+          <button class="btn" id="recBtn">See Recruiter View</button>
+        </div>
+      `)}
+      ${UI.visual('img/09_recruiter_view.jpg', 'Seeing your resume through a recruiter\'s lens', 'Insights, expectations, and how to improve your chances.')}
+    </div>
 
     <div id="recResult"></div>
   `);
@@ -1181,23 +1258,26 @@ tracker() {
     ${UI.head('Module 09', 'Job Tracker',
       'Every application, every round, every follow-up.')}
 
-    ${UI.panel('Add Application Manually', `
-      <div class="grid grid-2">
-        <div>
-          <label for="trTitle">Job Title</label>
-          <input type="text" id="trTitle" placeholder="Backend Engineer">
+    <div class="split" style="margin-bottom:18px">
+      ${UI.panel('Add Application Manually', `
+        <div class="grid grid-2">
+          <div>
+            <label for="trTitle">Job Title</label>
+            <input type="text" id="trTitle" placeholder="Backend Engineer">
+          </div>
+          <div>
+            <label for="trCompany">Company</label>
+            <input type="text" id="trCompany" placeholder="Acme Corp">
+          </div>
         </div>
-        <div>
-          <label for="trCompany">Company</label>
-          <input type="text" id="trCompany" placeholder="Acme Corp">
+        <label for="trNotes">Notes</label>
+        <input type="text" id="trNotes" placeholder="Referred by Sam. Recruiter call on Friday.">
+        <div class="btn-row">
+          <button class="btn" id="trAdd">Add</button>
         </div>
-      </div>
-      <label for="trNotes">Notes</label>
-      <input type="text" id="trNotes" placeholder="Referred by Sam. Recruiter call on Friday.">
-      <div class="btn-row">
-        <button class="btn" id="trAdd">Add</button>
-      </div>
-    `)}
+      `)}
+      ${UI.visual('img/10_job_tracker.jpg', 'Tracking every application, round, and outcome', 'Stay organized, monitor progress, never miss a follow-up.')}
+    </div>
 
     ${UI.panel(`All Applications (${apps.length})`, apps.length ? `
       <table>

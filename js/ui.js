@@ -118,6 +118,31 @@ const UI = {
       </div>`;
   },
 
+  /* Small inline icon set used in the hero strip and section heads.
+     Kept as literal SVG (not an icon font/CDN) so the app has no
+     extra network dependency. */
+  _icons: {
+    doc:  '<path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6" fill="none" stroke-width="1.6"/>',
+    bars: '<path d="M4 20V10M11 20V4M18 20v-7"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke-width="1.6"/>',
+    bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
+  },
+  icon(name, size = 20) {
+    const body = this._icons[name] || '';
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+  },
+
+  /* Illustration card used beside a module's form (the approved
+     HirePilot visual asset for that screen). Pass the image path
+     relative to index.html, e.g. 'img/02_resume_analysis.jpg'. */
+  visual(src, alt, caption = '') {
+    return `
+      <figure class="feature-visual">
+        <img src="${this.escape(src)}" alt="${this.escape(alt)}" loading="lazy">
+        ${caption ? `<figcaption>${this.escape(caption)}</figcaption>` : ''}
+      </figure>`;
+  },
+
   panel(title, inner) {
     return `
       <div class="panel">
