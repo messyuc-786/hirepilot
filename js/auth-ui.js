@@ -11,6 +11,7 @@ const AuthUI = {
 
   login() {
     UI.render(`
+      <div class="auth-page">
       ${UI.head('Welcome back', 'Log In', 'Pick up where you left off.')}
       <div class="auth-card">
         ${UI.panel('', `
@@ -29,6 +30,7 @@ const AuthUI = {
             <button class="link-btn" id="authGoSignup">Need an account? Sign up</button>
           </div>
         `)}
+      </div>
       </div>
     `);
 
@@ -50,6 +52,7 @@ const AuthUI = {
 
   signup() {
     UI.render(`
+      <div class="auth-page">
       ${UI.head('Get Started', 'Create Your Account', 'Free — takes about a minute.')}
       <div class="auth-card">
         ${UI.panel('', `
@@ -70,6 +73,7 @@ const AuthUI = {
             <button class="link-btn" id="authGoLogin">Already have an account? Log in</button>
           </div>
         `)}
+      </div>
       </div>
     `);
 
@@ -96,6 +100,7 @@ const AuthUI = {
 
   reset() {
     UI.render(`
+      <div class="auth-page">
       ${UI.head('Password Reset', 'Reset Your Password', 'We\'ll email you a link to set a new one.')}
       <div class="auth-card">
         ${UI.panel('', `
@@ -110,6 +115,7 @@ const AuthUI = {
             <button class="link-btn" id="authGoLogin">Back to log in</button>
           </div>
         `)}
+      </div>
       </div>
     `);
 

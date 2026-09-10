@@ -43,6 +43,15 @@
 /* ---------- 2. RESET ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* The native [hidden] attribute only wins a specificity tie against
+   an element's own class rule if it comes /after/ that rule in the
+   cascade — it doesn't, by default, since browsers put the UA
+   stylesheet first. Any element toggled via `.hidden = true` that
+   also has its own unconditional `display` rule (e.g. .topbar-right,
+   .mock-badge) would otherwise stay visible. Force it explicitly,
+   once, for every element in the app. */
+[hidden] { display: none !important; }
+
 body {
   font-family: var(--sans);
   background: var(--bg);
@@ -565,7 +574,18 @@ tr:last-child td { border-bottom: none; }
 
 /* Auth screens (login/signup/reset) — reuse .panel, .btn, and the
    standard input styles; only a max-width wrapper and a couple of
-   small text links are new. */
+   small text links are new. .auth-page centers the whole thing in
+   the viewport instead of leaving it stuck top-left of a mostly
+   empty page (the default flow every other screen uses, which
+   makes sense when there's a full page of content below, not here). */
+.auth-page {
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 56vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 .auth-card { max-width: 420px; }
 .auth-links { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
 .link-btn {
@@ -813,13 +833,20 @@ tr:last-child td { border-bottom: none; }
 .progress-panel > div { padding: 20px 26px; }
 .progress-panel > div:first-child { border-right: 1px solid var(--line); }
 
-/* Feature illustration card used across module screens */
+/* Feature illustration card used across module screens.
+   The source photos are portrait — without a constrained aspect
+   ratio, an img at width:100% simply renders at its own natural
+   (tall) height, which can run 900px+ on desktop and force a lot
+   of scrolling to reach the form's results below it. A fixed,
+   landscape-leaning aspect keeps the illustration proportioned to
+   the form beside it regardless of the source photo's own shape. */
 .feature-visual {
   border-radius: var(--r);
   overflow: hidden;
   border: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
   background: var(--panel);
+  aspect-ratio: 3 / 2;
 }
 .feature-visual img { width: 100%; height: 100%; object-fit: cover; }
 

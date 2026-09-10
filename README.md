@@ -261,7 +261,7 @@ network calls, zero auth required, for quota-free UI testing.
 **Setup**
 - [ ] App loads with no console errors (F12)
 - [ ] Mock Mode badge shows when `?aimode=mock` is set, hidden otherwise
-- [ ] API Settings modal opens/closes; a bad Groq key shows a clear error
+- [ ] AI Settings modal opens/closes (model preference only — no key to enter)
 
 **Data**
 - [ ] Resume/application/interview saved while signed in appears in
