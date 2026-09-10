@@ -2,8 +2,9 @@
 
 An AI-powered career platform: resume analysis, job matching, mock interviews,
 and application tracking. Built with plain HTML, CSS, and JavaScript — no
-bundler, no framework, no `npm install`. Supabase (via CDN) handles
-accounts and the database; Groq handles the AI.
+bundler, no framework, no `npm install`. Supabase (via CDN) handles accounts
+and the database; a Supabase Edge Function calls Groq server-side, so no
+user ever sees, enters, or stores an AI provider key.
 
 ---
 
@@ -47,7 +48,11 @@ hirepilot-ai/
 ├── img/                    the approved 3D visual assets
 ├── supabase/
 │   ├── schema.sql          run this once in your Supabase project
-│   └── README.md
+│   ├── README.md
+│   └── functions/
+│       └── ai/
+│           └── index.ts    server-side AI proxy — the only place
+│                            GROQ_API_KEY is ever read (as a secret)
 └── js/
     ├── config.js            settings + AI_MODE toggle
     ├── supabase-client.js   your Project URL + anon key go here
@@ -128,18 +133,28 @@ live mode for a small, deliberate smoke test — see Step 4.
 
 ---
 
-## Step 4 — Get Your Free Groq Key (for live-mode testing)
+## Step 4 — Deploy the AI Backend (one time, for live mode)
 
-`?aimode=live` (the default) still calls Groq directly from the browser with
-a key you paste into Settings. This is a known, temporary state — see
-**Where This Still Falls Short of "Normal SaaS"** below.
+`?aimode=live` (the default) sends requests through a Supabase Edge
+Function — `supabase/functions/ai` — authenticated with the signed-in
+user's Supabase session. **No user ever sees or enters an AI provider
+key.** The Groq key lives only as a server-side secret on that function.
 
-1. Go to **console.groq.com**, sign up, **API Keys** → **Create API Key**.
-2. In HirePilot, open the hamburger menu → **API Settings**, paste it, Save.
+1. Get a free Groq key: **console.groq.com** → sign up → **API Keys** →
+   **Create API Key**.
+2. Install/use the Supabase CLI (no global install needed) and deploy:
 
-The app tests the key immediately — the status dot in the header turns
-green. Free tier: roughly 14,400 requests/day, 30/minute — plenty for
-testing your own app.
+```bash
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase secrets set GROQ_API_KEY=your_key_here
+npx supabase functions deploy ai
+```
+
+That's it — every signed-in user's live-mode requests now route through
+your function. Nobody pastes a key anywhere. The Settings screen (hamburger
+→ AI Settings) only lets a user pick a preferred model; there's nothing
+else to configure.
 
 ---
 
@@ -194,22 +209,26 @@ visits gets the no-auth local-only fallback instead of real accounts.
 
 ---
 
-## Where This Still Falls Short of "Normal SaaS"
+## The Full Architecture (as of this build)
 
-Auth and the database are real. The AI call is not yet fully backend-only:
+```
+Browser  →  Supabase Auth (sign up / log in / session)
+         →  Supabase Database (RLS: every row scoped to auth.uid())
+         →  Supabase Edge Function "ai"  →  Groq (server-side key only)
+```
 
-**Today:** `?aimode=live` still sends the user's own Groq key straight from
-the browser to Groq (same as before auth existed). A user who wants live
-results still has to paste a key into Settings.
+This is now a normal SaaS shape end to end: **Sign Up → Home → use any
+tool → results saved to your account.** Nobody signs up for an AI
+provider, generates a key, or pastes it anywhere — that complexity lives
+entirely behind `supabase/functions/ai`, in a secret only that function's
+server-side environment can read.
 
-**The remaining piece:** a server-side AI proxy (e.g. a Supabase Edge
-Function) that holds the Groq key as a server secret, so the frontend calls
-your own `/api/ai`-style endpoint and never touches a provider key at all.
-That's the last step toward "sign in and use it" with zero configuration —
-not yet built. See the in-repo conversation history (or ask) for the phased
-plan; it's blocked on picking and standing up that backend, which needs to
-be deployed and tested against a real endpoint before it can replace the
-client-side Groq call.
+`js/storage.js` still reads/writes `localStorage` synchronously — that
+never changed, and no feature screen had to be rewritten for any of this.
+`js/cloud-sync.js` mirrors those writes to Supabase in the background;
+`js/api.js` routes AI calls to the Edge Function instead of Groq directly.
+Mock mode (`?aimode=mock`) bypasses all of the above entirely — zero
+network calls, zero auth required, for quota-free UI testing.
 
 ---
 
@@ -217,12 +236,13 @@ client-side Groq call.
 
 - **Supabase anon key** — safe in frontend code by design. RLS protects the
   data, not secrecy of this key.
-- **Groq key** — each user pastes their own into Settings; it's stored only
-  in their browser and sent only to Groq. Never put a Groq key in your
-  source code or commit it — anyone can read anything shipped to the
-  browser.
-- **Never** put a Supabase `service_role` key or your database password in
-  any frontend file. Only the anon/publishable key belongs in
+- **Groq key** — lives only as a Supabase Edge Function secret
+  (`supabase secrets set GROQ_API_KEY=...`), never in any frontend file,
+  never in `localStorage`, never in this repo. The frontend authenticates
+  to the *function* with the user's own Supabase session token — it never
+  has, needs, or can see the Groq key itself.
+- **Never** put a Supabase `service_role` key, a database password, or the
+  Groq key in any frontend file. Only the anon/publishable key belongs in
   `supabase-client.js`.
 - Mock mode makes zero external network calls of any kind — safe to leave
   on for demos where you don't want to touch anyone's real quota.
@@ -330,9 +350,14 @@ Confirm you're signed into the *same* account, and that
 show `resumes`, `applications`, `job_analyses`, `interviews`, etc. with a
 padlock icon next to each, meaning RLS is on).
 
-**"No API key set" in live mode**
-Open the hamburger → API Settings, paste your Groq key, Save. Or just use
-mock mode (`?aimode=mock`) instead.
+**"Network error" / CORS error in live mode**
+The Edge Function isn't deployed yet, or `GROQ_API_KEY` hasn't been set as
+a secret — see Step 4. Use mock mode (`?aimode=mock`) in the meantime.
+
+**"Please log in to use AI features"**
+Live mode requires a signed-in session — this shouldn't normally be
+reachable since the whole app is gated behind auth, but if you see it, log
+back in.
 
 **PDF upload does nothing**
 Check the console. If PDF.js failed to load, check your internet connection
@@ -347,11 +372,9 @@ reloads.
 
 ## Where to Take It Next
 
-1. **Server-side AI proxy** — the one piece standing between this and a
-   true zero-config SaaS experience (see above).
-2. **`.docx` support** — add Mammoth.js (instructions in `parser.js`).
-3. **Export to PDF** — add jsPDF, let users download optimized resumes.
-4. **Save Career Gap / LinkedIn / Cover Letter results** — those three
+1. **`.docx` support** — add Mammoth.js (instructions in `parser.js`).
+2. **Export to PDF** — add jsPDF, let users download optimized resumes.
+3. **Save Career Gap / LinkedIn / Cover Letter results** — those three
    screens are display-only today; `schema.sql` already has
    `career_gaps`/`linkedin_reviews`/`cover_letters` tables ready for when
    that's built.

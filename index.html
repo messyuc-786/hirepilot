@@ -101,7 +101,7 @@
     </div>
 
     <div class="drawer-foot">
-      <button class="drawer-foot-btn" id="settingsBtn">API Settings</button>
+      <button class="drawer-foot-btn" id="settingsBtn">AI Settings</button>
       <button class="drawer-foot-btn" id="helpBtn">Help</button>
       <button class="drawer-foot-btn" id="logoutBtn" hidden>Log Out</button>
     </div>
@@ -110,15 +110,11 @@
   <!-- ============ SETTINGS MODAL ============ -->
   <div class="modal" id="settingsModal" hidden>
     <div class="modal-box">
-      <h2>API Settings</h2>
+      <h2>AI Settings</h2>
       <p class="muted">
-        HirePilot runs on <strong>Groq</strong> — a free AI API. Get a key at
-        <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a>
-        (no credit card needed).
+        AI requests are handled securely by HirePilot's own backend —
+        there's no API key for you to manage.
       </p>
-
-      <label for="apiKeyInput">Groq API Key</label>
-      <input type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off">
 
       <label for="modelSelect">Model</label>
       <select id="modelSelect">
@@ -127,8 +123,9 @@
       </select>
 
       <div class="notice">
-        Your key is stored only in this browser (localStorage). It is never sent
-        anywhere except directly to Groq. It is not in your GitHub repo.
+        Choosing a model here only sets a preference — it's passed along with
+        each request, but the AI provider connection itself is never exposed
+        to your browser.
       </div>
 
       <div class="modal-actions">

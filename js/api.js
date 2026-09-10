@@ -1,12 +1,18 @@
 /* ============================================================
-   api.js — Talks to the Groq AI API.
+   api.js — Talks to HirePilot's server-side AI proxy.
 
    Every feature in this app funnels through ONE function: API.ask().
    That means error handling, retries, and JSON parsing are written
    once instead of ten times.
 
-   Groq uses the same request format as OpenAI, so if you ever switch
-   providers you only change CONFIG.API_URL and the model name.
+   LIVE MODE: the request goes to a Supabase Edge Function
+   (supabase/functions/ai) authenticated with the signed-in user's
+   Supabase access token — never a provider key. The Groq key lives
+   only in that function's server-side environment; it is never
+   sent to, or storable by, the browser. See supabase/functions/ai/
+   index.ts for the server side of this.
+
+   MOCK MODE: no network call at all — see mock-ai.js.
    ============================================================ */
 
 const API = {
@@ -18,26 +24,34 @@ const API = {
      user:   the actual content to analyse
      ------------------------------------------------------------ */
   async ask(system, user) {
-    // Mock mode: no network call, no key, no quota spent. See
+    // Mock mode: no network call, no auth, no quota spent. See
     // config.js (CONFIG.AI_MODE / Config.aiMode()) and mock-ai.js.
     if (Config.aiMode() === 'mock') {
       await new Promise(r => setTimeout(r, 350)); // feels like a real call, for loading-state QA
       return MockAI.respond(system);
     }
 
-    const key = Storage.getApiKey();
+    if (!Auth.enabled()) {
+      throw new Error('AI features need Supabase configured — see js/supabase-client.js.');
+    }
+    if (!Auth.isSignedIn()) {
+      throw new Error('Please log in to use AI features.');
+    }
 
-    if (!key) {
-      throw new Error('No API key set. Click "API Settings" in the sidebar.');
+    const { data: { session } } = await SB.auth.getSession();
+    const token = session?.access_token;
+    if (!token) {
+      throw new Error('Your session has expired. Please log in again.');
     }
 
     let response;
     try {
-      response = await fetch(CONFIG.API_URL, {
+      response = await fetch(`${SUPABASE_URL}/functions/v1/ai`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${key}`,
+          'Authorization': `Bearer ${token}`,
+          'apikey': SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
           model: Storage.getModel(),
@@ -83,7 +97,7 @@ const API = {
 
     switch (response.status) {
       case 401:
-        return 'Invalid API key. Check it in API Settings.';
+        return 'Your session has expired. Please log in again.';
       case 429:
         return 'Rate limit hit. Wait about a minute and try again.';
       case 413:
@@ -123,7 +137,7 @@ const API = {
   },
 
   /* ------------------------------------------------------------
-     test() — verify a key works, used by the Settings modal.
+     test() — verify the AI backend is reachable, used by Settings.
      ------------------------------------------------------------ */
   async test() {
     await this.ask(

@@ -6,12 +6,12 @@
 const CONFIG = {
 
   // ---- AI MODE ----
-  // 'live' — real calls to the AI provider (today: client-side Groq,
-  //          same as before this flag existed). This is the
-  //          deployed/production default — real users always get
-  //          real analysis.
+  // 'live' — real AI calls, routed through the server-side Edge
+  //          Function (supabase/functions/ai) using the signed-in
+  //          user's session — no provider key ever touches the
+  //          browser. This is the deployed/production default.
   // 'mock' — every AI call returns a deterministic canned response
-  //          from mock-ai.js instead. No network call, no API key
+  //          from mock-ai.js instead. No network call, no auth
   //          needed, no quota spent. This is what UI/UX/navigation/
   //          responsive QA should run under — never repeatedly hit
   //          the real API just to check a layout.
@@ -21,11 +21,6 @@ const CONFIG = {
   // localStorage/URL override on top, for flipping modes
   // interactively during development without editing this file.
   AI_MODE: 'live',
-
-  // ---- AI PROVIDER ----
-  // Groq is free, needs no credit card, and is very fast.
-  // Get a key at https://console.groq.com
-  API_URL: 'https://api.groq.com/openai/v1/chat/completions',
 
   DEFAULT_MODEL: 'llama-3.3-70b-versatile',
 
@@ -39,7 +34,6 @@ const CONFIG = {
   // ---- STORAGE KEYS ----
   // These are the "drawer labels" for browser localStorage.
   KEYS: {
-    API_KEY:      'hirepilot_api_key',
     MODEL:        'hirepilot_model',
     RESUMES:      'hirepilot_resumes',
     APPLICATIONS: 'hirepilot_applications',

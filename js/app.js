@@ -105,15 +105,6 @@ const App = {
     document.getElementById('mockBadge').hidden = !mock;
 
     this.go('dashboard');
-
-    // Nudge first-time users toward setting up their key — only
-    // relevant in live mode with no backend proxy yet. Mock mode
-    // needs no key at all.
-    if (!mock && !Storage.hasApiKey()) {
-      setTimeout(() => {
-        UI.toast('Add your free Groq API key to get started — open the menu and choose API Settings.');
-      }, 700);
-    }
   },
 
   /* The drawer's icon slots are plain <span id="di..."> placeholders
@@ -221,16 +212,14 @@ const App = {
   /* ---------- SETTINGS MODAL ---------- */
 
   bindSettings() {
-    const modal  = document.getElementById('settingsModal');
-    const keyIn  = document.getElementById('apiKeyInput');
-    const model  = document.getElementById('modelSelect');
+    const modal = document.getElementById('settingsModal');
+    const model = document.getElementById('modelSelect');
 
     const open = () => {
       this.closeDrawer();
-      keyIn.value = Storage.getApiKey();
       model.value = Storage.getModel();
       modal.hidden = false;
-      keyIn.focus();
+      model.focus();
     };
 
     const close = () => { modal.hidden = true; };
@@ -248,18 +237,16 @@ const App = {
       if (e.key === 'Escape' && !modal.hidden) close();
     });
 
-    UI.busyClick(document.getElementById('saveSettings'), 'Testing...', async () => {
-      const key = keyIn.value.trim();
+    UI.busyClick(document.getElementById('saveSettings'), 'Checking...', async () => {
+      Storage.setModel(model.value);
 
-      if (!key) {
-        UI.toast('Please paste your Groq API key.', 'err');
+      if (Config.aiMode() === 'mock') {
+        close();
+        UI.toast('Saved. (Mock mode is on — no real request was made.)', 'ok');
         return;
       }
 
-      Storage.setApiKey(key);
-      Storage.setModel(model.value);
-
-      UI.toast('Testing your key...');
+      UI.toast('Checking connection...');
 
       try {
         await API.test();
@@ -295,7 +282,12 @@ const App = {
 
   updateStatus() {
     const el = document.getElementById('apiStatus');
-    if (Storage.hasApiKey()) {
+    // "Connected" now means "signed in and able to reach the AI
+    // backend" — there is no provider key of the user's own to
+    // check anymore. Mock mode also counts as connected (it works
+    // with or without a session).
+    const connected = Config.aiMode() === 'mock' || Auth.isSignedIn();
+    if (connected) {
       el.className = 'status live';
       el.innerHTML = '<span class="dot"></span> Connected';
     } else {

@@ -40,12 +40,9 @@ const Storage = {
     localStorage.removeItem(key);
   },
 
-  /* ---------- API KEY ---------- */
-
-  getApiKey()      { return this.get(CONFIG.KEYS.API_KEY, ''); },
-  setApiKey(k)     { return this.set(CONFIG.KEYS.API_KEY, k); },
-  hasApiKey()      { return !!this.getApiKey(); },
-
+  /* Model preference only — no provider key is ever stored here.
+     Live-mode AI requests are authenticated with the user's
+     Supabase session instead (see js/api.js, supabase/functions/ai). */
   getModel()       { return this.get(CONFIG.KEYS.MODEL, CONFIG.DEFAULT_MODEL); },
   setModel(m)      { return this.set(CONFIG.KEYS.MODEL, m); },
 
