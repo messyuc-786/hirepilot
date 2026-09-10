@@ -37,7 +37,7 @@
   --shadow-sm: 0 1px 2px rgba(15,23,42,.04);
   --shadow: 0 1px 2px rgba(15,23,42,.04), 0 12px 28px -14px rgba(15,23,42,.16);
 
-  --sidebar-w: 252px;
+  --sidebar-w: 236px;
 }
 
 /* ---------- 2. RESET ---------- */
@@ -155,7 +155,7 @@ img { display: block; max-width: 100%; }
 .status.live { color: var(--green); }
 
 /* ---------- 4. MAIN AREA ---------- */
-.main { flex: 1; padding: 34px 40px 80px; max-width: 1180px; }
+.main { flex: 1; padding: 32px 40px 70px; max-width: 1400px; }
 
 .view-head { margin-bottom: 26px; }
 
@@ -191,6 +191,10 @@ h3 { font-size: 14.5px; font-weight: 650; margin-bottom: 8px; color: var(--navy)
 
 /* Split layout: form/content on one side, illustration on the other */
 .split { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; align-items: start; }
+/* Table-heavy screens (Job Tracker) need the form column to stay
+   compact and let the illustration take a smaller, secondary role
+   rather than competing evenly with a 3-field form. */
+.split-compact { grid-template-columns: 1.6fr .65fr; }
 .split > .panel { margin-bottom: 0; }
 
 /* Stat readout */
@@ -479,23 +483,31 @@ tr:last-child td { border-bottom: none; }
   font-size: 13.5px;
 }
 
-/* ---------- 13. HERO (Dashboard first screen) ---------- */
+/* ---------- 13. HERO (Dashboard first screen) ----------
+   The 3D artwork bleeds edge-to-edge in its own column instead of
+   sitting as a letterboxed, inset thumbnail — it's the emotional
+   identity of the product, not a decorative rectangle. */
 .hero {
   position: relative;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 20px;
   box-shadow: var(--shadow);
-  padding: 44px 44px 0;
   margin-bottom: 22px;
   overflow: hidden;
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  align-items: center;
+  grid-template-columns: 1fr 1.05fr;
+  align-items: stretch;
+}
+
+.hero-copy {
+  padding: 40px 30px 40px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hero-eyebrow {
@@ -507,7 +519,7 @@ tr:last-child td { border-bottom: none; }
 .hero-eyebrow span { color: var(--blue); }
 
 .hero-copy h1 {
-  font-size: 44px;
+  font-size: 42px;
   line-height: 1.08;
   letter-spacing: -1px;
   margin-bottom: 14px;
@@ -517,25 +529,21 @@ tr:last-child td { border-bottom: none; }
 .hero-copy p {
   font-size: 15.5px;
   color: var(--muted);
-  max-width: 46ch;
-  margin-bottom: 22px;
+  max-width: 44ch;
+  margin-bottom: 20px;
   line-height: 1.65;
 }
 
 .hero-fine { font-size: 12px; color: var(--muted); margin-top: 12px; }
 
 .hero-visual {
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--line);
-  align-self: end;
+  align-self: stretch;
+  min-height: 320px;
   /* The source photo bakes its own HirePilot logo, headline and CTA
      into its left third (duplicating the real heading beside it) and
      a filename caption in the bottom-left corner. Cropping to the
      right two-thirds keeps the character scene as pure illustration
      and removes both artifacts in one move. */
-  aspect-ratio: 16 / 9;
 }
 .hero-visual img { width: 100%; height: 100%; object-fit: cover; object-position: 100% 50%; display: block; }
 
@@ -543,14 +551,67 @@ tr:last-child td { border-bottom: none; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
-  margin: 34px 0 0;
-  padding: 22px 0;
+  padding: 20px 44px;
   border-top: 1px solid var(--line);
 }
 .hero-strip-item { display: flex; gap: 10px; align-items: flex-start; }
 .hero-strip-item svg { flex-shrink: 0; color: var(--blue); margin-top: 2px; }
 .hero-strip-item strong { display: block; font-size: 13px; color: var(--navy); margin-bottom: 2px; }
 .hero-strip-item span { font-size: 12px; color: var(--muted); }
+
+/* Quick Actions — compact link cards into the modules a user is
+   most likely to want next, so the dashboard reads as "here's what
+   to do" rather than a pile of disconnected stat cards. */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.quick-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sans);
+  transition: border-color .15s, box-shadow .15s, transform .1s;
+}
+.quick-action:hover { border-color: var(--blue); box-shadow: var(--shadow); }
+.quick-action:active { transform: translateY(1px); }
+.quick-action .qa-icon {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  background: var(--tint);
+  color: var(--blue);
+  border-radius: 10px;
+}
+.quick-action strong { display: block; font-size: 13.5px; color: var(--navy); }
+.quick-action span { font-size: 11.5px; color: var(--muted); }
+
+/* Key stats — one panel with four columns divided by hairlines,
+   instead of four separate thin cards with padding fighting padding. */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.stats-row > div { padding: 18px 24px; border-right: 1px solid var(--line); }
+.stats-row > div:last-child { border-right: none; }
+
+/* Progress / performance — the two score panels sharing one card,
+   split by a single hairline instead of two full duplicate cards. */
+.progress-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.progress-panel > div { padding: 20px 26px; }
+.progress-panel > div:first-child { border-right: 1px solid var(--line); }
 
 /* Feature illustration card used across module screens */
 .feature-visual {
@@ -593,6 +654,7 @@ tr:last-child td { border-bottom: none; }
 @media (max-width: 1080px) {
   .hero-copy h1 { font-size: 36px; }
   .split { grid-template-columns: 1fr; }
+  .quick-actions { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 900px) {
@@ -612,18 +674,29 @@ tr:last-child td { border-bottom: none; }
   .sidebar-foot { border-top: none; border-left: 1px solid var(--line); white-space: nowrap; }
   .main { padding: 22px 18px 60px; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .quick-actions { grid-template-columns: repeat(2, 1fr); }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .stats-row > div:nth-child(2) { border-right: none; }
+  .stats-row > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
 
-  .hero { padding: 28px 22px 0; border-radius: 16px; }
-  .hero-grid { grid-template-columns: 1fr; gap: 20px; }
-  .hero-copy h1 { font-size: 30px; }
-  .hero-visual { order: -1; max-height: 220px; }
-  .hero-strip { grid-template-columns: repeat(2, 1fr); gap: 16px 20px; }
+  .hero { border-radius: 16px; }
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-copy { padding: 24px 20px 20px; }
+  .hero-copy h1 { font-size: 29px; }
+  .hero-visual { order: -1; height: 200px; min-height: 0; }
+  .hero-strip { grid-template-columns: repeat(2, 1fr); gap: 14px 18px; padding: 18px 20px; }
 }
 
 @media (max-width: 480px) {
-  .hero-copy h1 { font-size: 26px; }
-  .hero-strip { grid-template-columns: 1fr; }
+  .hero-copy { padding: 20px 18px 18px; }
+  .hero-copy h1 { font-size: 25px; }
+  .hero-copy p { margin-bottom: 16px; }
+  .hero-strip { grid-template-columns: 1fr; gap: 12px; padding: 16px 18px; }
   .btn-lg { width: 100%; text-align: center; }
+  .quick-actions, .progress-panel, .stats-row { grid-template-columns: 1fr; }
+  .stats-row > div { border-right: none !important; border-bottom: 1px solid var(--line); }
+  .stats-row > div:last-child { border-bottom: none; }
+  .progress-panel > div:first-child { border-right: none; border-bottom: 1px solid var(--line); }
 }
 
 /* ---------- 15. ACCESSIBILITY ---------- */

@@ -66,32 +66,52 @@ dashboard() {
       </div>
     </section>
 
-    <div class="grid grid-4" style="margin-bottom:18px">
-      ${UI.stat('Resumes', s.resumes)}
-      ${UI.stat('Applications', s.applications)}
-      ${UI.stat('Interviews', s.interviews, true)}
-      ${UI.stat('Offers', s.offers, true)}
+    <div class="panel stats-row" style="margin-bottom:18px">
+      <div><div class="stat-label">Resumes</div><div class="stat-value">${s.resumes}</div></div>
+      <div><div class="stat-label">Applications</div><div class="stat-value">${s.applications}</div></div>
+      <div><div class="stat-label">Interviews</div><div class="stat-value cyan">${s.interviews}</div></div>
+      <div><div class="stat-label">Offers</div><div class="stat-value cyan">${s.offers}</div></div>
     </div>
 
-    <div class="grid grid-2">
-      ${UI.panel('Success Rate', `
-        ${UI.score(s.successRate, 'Offers per application', true)}
-        <p class="muted" style="margin-top:12px">
-          ${s.applications === 0
-            ? 'No applications tracked yet. Start with the Resume Analyzer.'
-            : `${s.offers} offer${s.offers === 1 ? '' : 's'} from ${s.applications} application${s.applications === 1 ? '' : 's'}.`}
-        </p>
-      `)}
-
-      ${UI.panel('Interview Performance', `
-        ${UI.score(s.avgInterviewScore, 'Average score')}
-        <p class="muted" style="margin-top:12px">
-          ${s.interviews === 0
-            ? 'No mock interviews yet. Practice makes this number move.'
-            : `Across ${s.interviews} mock interview${s.interviews === 1 ? '' : 's'}.`}
-        </p>
-      `)}
+    <div class="quick-actions">
+      <button class="quick-action" data-go="resume">
+        <span class="qa-icon">${UI.icon('doc')}</span>
+        <div><strong>Analyze a Resume</strong><span>Skills, ATS score, gaps</span></div>
+      </button>
+      <button class="quick-action" data-go="jd">
+        <span class="qa-icon">${UI.icon('target')}</span>
+        <div><strong>Match a Job</strong><span>See your fit score</span></div>
+      </button>
+      <button class="quick-action" data-go="interview">
+        <span class="qa-icon">${UI.icon('chat')}</span>
+        <div><strong>Practice an Interview</strong><span>5 questions, real feedback</span></div>
+      </button>
+      <button class="quick-action" data-go="tracker">
+        <span class="qa-icon">${UI.icon('list')}</span>
+        <div><strong>Track Applications</strong><span>Every round, every follow-up</span></div>
+      </button>
     </div>
+
+    ${UI.panel('Progress', `
+      <div class="progress-panel">
+        <div>
+          ${UI.score(s.successRate, 'Success rate — offers per application', true)}
+          <p class="muted" style="margin-top:12px">
+            ${s.applications === 0
+              ? 'No applications tracked yet. Start with the Resume Analyzer.'
+              : `${s.offers} offer${s.offers === 1 ? '' : 's'} from ${s.applications} application${s.applications === 1 ? '' : 's'}.`}
+          </p>
+        </div>
+        <div>
+          ${UI.score(s.avgInterviewScore, 'Interview performance — average score')}
+          <p class="muted" style="margin-top:12px">
+            ${s.interviews === 0
+              ? 'No mock interviews yet. Practice makes this number move.'
+              : `Across ${s.interviews} mock interview${s.interviews === 1 ? '' : 's'}.`}
+          </p>
+        </div>
+      </div>
+    `)}
 
     ${UI.panel('Recent Applications', apps.length ? `
       <div class="table-wrap"><table>
@@ -121,7 +141,7 @@ dashboard() {
         </div>
       </div>
       <div class="promo-card">
-        <img src="img/12_motivational.jpg" alt="Small steps, big opportunities" loading="lazy">
+        <img src="img/12_motivational.jpg" alt="Small steps, big opportunities" loading="lazy" class="crop-caption">
         <div class="promo-body">
           <strong>Small Steps, Big Opportunities</strong>
           <span>Plan. Prepare. Practice. Progress.</span>
@@ -132,6 +152,10 @@ dashboard() {
 
   document.getElementById('heroGetStarted')
     ?.addEventListener('click', () => App.go(isNew ? 'resume' : 'jd'));
+
+  document.querySelectorAll('[data-go]').forEach(btn => {
+    btn.addEventListener('click', () => App.go(btn.dataset.go));
+  });
 },
 
 
@@ -155,7 +179,7 @@ resume() {
           <button class="btn" id="analyzeBtn">Analyze Resume</button>
         </div>
       `)}
-      ${UI.visual('img/02_resume_analysis.jpg', 'A resume analysis in progress, with a green "Great Start!" check', 'Skills, ATS score, grammar, and missing keywords — in one pass.')}
+      ${UI.visual('img/02_resume_analysis.jpg', 'A resume analysis in progress, with a green "Great Start!" check', 'Skills, ATS score, grammar, and missing keywords — in one pass.', true)}
     </div>
 
     <div id="resumeResult"></div>
@@ -1258,7 +1282,7 @@ tracker() {
     ${UI.head('Module 09', 'Job Tracker',
       'Every application, every round, every follow-up.')}
 
-    <div class="split" style="margin-bottom:18px">
+    <div class="split split-compact" style="margin-bottom:18px">
       ${UI.panel('Add Application Manually', `
         <div class="grid grid-2">
           <div>
@@ -1276,7 +1300,7 @@ tracker() {
           <button class="btn" id="trAdd">Add</button>
         </div>
       `)}
-      ${UI.visual('img/10_job_tracker.jpg', 'Tracking every application, round, and outcome', 'Stay organized, monitor progress, never miss a follow-up.')}
+      ${UI.visual('img/10_job_tracker.jpg', 'Tracking every application, round, and outcome', 'Stay organized, monitor progress, never miss a follow-up.', true)}
     </div>
 
     ${UI.panel(`All Applications (${apps.length})`, apps.length ? `

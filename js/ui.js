@@ -126,6 +126,9 @@ const UI = {
     bars: '<path d="M4 20V10M11 20V4M18 20v-7"/>',
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke-width="1.6"/>',
     bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
+    target: '<circle cx="12" cy="12" r="8" fill="none" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke-width="1.6"/><circle cx="12" cy="12" r="1.4"/>',
+    chat: '<path d="M4 5h16v11H9l-4 4v-4H4Z" fill="none" stroke-width="1.6" stroke-linejoin="round"/>',
+    list: '<path d="M9 6h11M9 12h11M9 18h11" stroke-width="1.6"/><circle cx="4.5" cy="6" r="1.4"/><circle cx="4.5" cy="12" r="1.4"/><circle cx="4.5" cy="18" r="1.4"/>',
   },
   icon(name, size = 20) {
     const body = this._icons[name] || '';
