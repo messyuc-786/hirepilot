@@ -182,6 +182,7 @@ const CloudSync = {
     Storage.remove(CONFIG.KEYS.RESUMES);
     Storage.remove(CONFIG.KEYS.APPLICATIONS);
     Storage.remove(CONFIG.KEYS.INTERVIEWS);
+    Storage.remove(CONFIG.KEYS.PREHIRED); // in-progress guided-journey state — local-only, same reasoning as the three above
   },
 
   /* ---------- push: one write, fire-and-forget ---------- */

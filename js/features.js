@@ -46,7 +46,10 @@ dashboard() {
           <div class="hero-eyebrow">Same You. New Possibilities. <span>A Brighter Tomorrow.</span></div>
           <h1>Your Next Career Move<br><span class="accent">Starts Here.</span></h1>
           <p>Analyze. Improve. Prepare. Apply smarter. All in one place, with the power of AI.</p>
-          <button class="btn btn-lg" id="heroGetStarted">Get Started &rarr;</button>
+          <div class="btn-row" style="margin-top:22px">
+            <button class="btn btn-lg" id="heroPreHired">${UI.icon('bolt', 18)} PreHired — Get Application-Ready</button>
+            <button class="btn-ghost btn-lg" id="heroGetStarted">Get Started &rarr;</button>
+          </div>
           <div class="hero-fine">It's free to begin. No credit card required.</div>
         </div>
         <div class="hero-visual">
@@ -139,6 +142,9 @@ dashboard() {
   document.getElementById('heroGetStarted')
     ?.addEventListener('click', () => App.go(isNew ? 'resume' : 'jd'));
 
+  document.getElementById('heroPreHired')
+    ?.addEventListener('click', () => App.go('prehired'));
+
   document.querySelectorAll('[data-go]').forEach(btn => {
     btn.addEventListener('click', () => App.go(btn.dataset.go));
   });
@@ -228,26 +234,8 @@ async runResume() {
 
   out.innerHTML = UI.loading('Analyzing resume');
 
-  const system = `You are an expert resume reviewer and ATS specialist.
-Analyse the resume and respond with ONLY a JSON object in this exact shape:
-{
-  "candidate_name": "string or Unknown",
-  "experience_level": "entry | mid | senior | executive",
-  "years_experience": number,
-  "skills": ["technical and soft skills found"],
-  "certifications": ["certifications found, empty array if none"],
-  "strength_score": number 0-100,
-  "ats_score": number 0-100,
-  "ats_issues": ["specific formatting problems that hurt ATS parsing"],
-  "grammar_issues": ["specific grammar or spelling problems found"],
-  "missing_keywords": ["important industry keywords absent from this resume"],
-  "strengths": ["what genuinely works well"],
-  "improvements": ["specific actionable fixes"]
-}
-Be specific and honest. Do not invent qualifications that are not present.`;
-
   try {
-    const r = await API.ask(system, text);
+    const r = await AIActions.analyzeResume(text);
 
     out.innerHTML = `
       <div class="grid grid-3" style="margin-bottom:18px">
@@ -366,25 +354,8 @@ async runJD() {
 
   out.innerHTML = UI.loading('Comparing resume against job description');
 
-  const system = `You are a technical recruiter comparing a resume against a job description.
-Respond with ONLY a JSON object in this exact shape:
-{
-  "match_percentage": number 0-100,
-  "required_skills": ["must-have skills from the JD"],
-  "preferred_skills": ["nice-to-have skills from the JD"],
-  "experience_required": "string, e.g. 5+ years",
-  "certifications_required": ["certifications the JD asks for"],
-  "key_responsibilities": ["main duties of the role"],
-  "matched_skills": ["skills the candidate HAS that the JD wants"],
-  "missing_skills": ["skills the JD wants that the candidate LACKS"],
-  "verdict": "one honest sentence on whether this is worth applying to",
-  "priority_fixes": ["the 3 highest-impact changes to improve this match"]
-}
-Base matched_skills strictly on the resume. Never assume unstated skills.`;
-
   try {
-    const r = await API.ask(system,
-      `RESUME:\n${resume.text}\n\n---\n\nJOB DESCRIPTION:\n${jdText}`);
+    const r = await AIActions.matchResumeToJD(resume.text, jdText);
 
     out.innerHTML = `
       <div class="grid grid-2" style="margin-bottom:18px">
@@ -492,32 +463,8 @@ async runOptimizer() {
 
   out.innerHTML = UI.loading('Rewriting for this role');
 
-  const system = `You are an expert resume writer.
-
-ABSOLUTE RULE: never fabricate. Do not add skills, jobs, certifications,
-metrics, or achievements that are not already present in the resume. If a
-bullet lacks a number, suggest where the candidate could add one — do NOT
-invent the number yourself. Use a placeholder like [X%] instead.
-
-Respond with ONLY a JSON object in this exact shape:
-{
-  "keywords_to_add": ["JD keywords the candidate can honestly claim, because the resume already shows the underlying experience"],
-  "improved_bullets": [
-    {
-      "original": "the exact bullet from the resume",
-      "improved": "the rewritten version",
-      "why": "what changed and why it is stronger"
-    }
-  ],
-  "quantify_opportunities": ["bullets that would be stronger with a metric, and what to measure"],
-  "skills_to_add": ["skills the candidate plausibly has based on the resume but has not listed"],
-  "reorder_advice": ["structural changes, e.g. which section to move up"],
-  "tailored_summary": "a 2-3 sentence professional summary targeted at this role, drawn only from real resume content"
-}`;
-
   try {
-    const r = await API.ask(system,
-      `RESUME:\n${resume.text}\n\n---\n\nTARGET JOB:\n${app.jdText}`);
+    const r = await AIActions.optimizeResume(resume.text, app.jdText);
 
     out.innerHTML = `
       ${UI.panel('Tailored Summary', `

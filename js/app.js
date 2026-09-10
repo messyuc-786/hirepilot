@@ -27,6 +27,7 @@ const App = {
      the UI that triggers these routes moved. */
   routes: {
     dashboard: () => Features.dashboard(),
+    prehired:  () => PreHired.start(),
     resume:    () => Features.resume(),
     jd:        () => Features.jd(),
     optimizer: () => Features.optimizer(),

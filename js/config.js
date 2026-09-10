@@ -43,6 +43,7 @@ const CONFIG = {
     RESUMES:      'hirepilot_resumes',
     APPLICATIONS: 'hirepilot_applications',
     INTERVIEWS:   'hirepilot_interviews',
+    PREHIRED:     'hirepilot_prehired', // active PreHired guided-journey state (per browser, not synced to Supabase)
   },
 
   // ---- APPLICATION STATUSES ----
