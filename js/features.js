@@ -94,7 +94,7 @@ dashboard() {
     </div>
 
     ${UI.panel('Recent Applications', apps.length ? `
-      <table>
+      <div class="table-wrap"><table>
         <thead>
           <tr><th>Role</th><th>Company</th><th>Match</th><th>Status</th></tr>
         </thead>
@@ -109,12 +109,12 @@ dashboard() {
               <td><span class="badge ${a.status}">${a.status}</span></td>
             </tr>`).join('')}
         </tbody>
-      </table>
+      </table></div>
     ` : UI.empty('Nothing tracked yet. Analyze a job description to add your first application.'))}
 
     <div class="grid grid-2">
       <div class="promo-card">
-        <img src="img/11_about_journey.jpg" alt="Different paths, brighter tomorrows — HirePilot is with you" loading="lazy">
+        <img src="img/11_about_journey.jpg" alt="Different paths, brighter tomorrows — HirePilot is with you" loading="lazy" class="crop-caption">
         <div class="promo-body">
           <strong>Different Paths. Brighter Tomorrows.</strong>
           <span>HirePilot is with you at every career stage.</span>
@@ -161,7 +161,7 @@ resume() {
     <div id="resumeResult"></div>
 
     ${saved.length ? UI.panel('Saved Resumes', `
-      <table>
+      <div class="table-wrap"><table>
         <thead><tr><th>Name</th><th>Date</th><th>Strength</th><th></th></tr></thead>
         <tbody>
           ${saved.map(r => `
@@ -174,7 +174,7 @@ resume() {
               <td><button class="btn-ghost" data-del-resume="${r.id}">Delete</button></td>
             </tr>`).join('')}
         </tbody>
-      </table>
+      </table></div>
     `) : ''}
   `);
 
@@ -329,7 +329,7 @@ jd() {
           <button class="btn" id="jdBtn">Analyze & Match</button>
         </div>
       `)}
-      ${UI.visual('img/03_jd_analysis.jpg', 'Finding your match against a job description', 'See required vs. preferred skills, and exactly what you\'re missing.')}
+      ${UI.visual('img/03_jd_analysis.jpg', 'Finding your match against a job description', 'See required vs. preferred skills, and exactly what you\'re missing.', true)}
     </div>
 
     <div id="jdResult"></div>
@@ -820,7 +820,7 @@ interview() {
     <div id="ivArea"></div>
 
     ${past.length ? UI.panel('Past Interviews', `
-      <table>
+      <div class="table-wrap"><table>
         <thead><tr><th>Type</th><th>Date</th><th>Score</th></tr></thead>
         <tbody>
           ${past.slice(0, 8).map(i => `
@@ -830,7 +830,7 @@ interview() {
               <td style="font-family:var(--mono);color:var(--amber)">${i.score}/100</td>
             </tr>`).join('')}
         </tbody>
-      </table>
+      </table></div>
     `) : ''}
   `);
 
@@ -1175,7 +1175,7 @@ recruiter() {
           <button class="btn" id="recBtn">See Recruiter View</button>
         </div>
       `)}
-      ${UI.visual('img/09_recruiter_view.jpg', 'Seeing your resume through a recruiter\'s lens', 'Insights, expectations, and how to improve your chances.')}
+      ${UI.visual('img/09_recruiter_view.jpg', 'Seeing your resume through a recruiter\'s lens', 'Insights, expectations, and how to improve your chances.', true)}
     </div>
 
     <div id="recResult"></div>
@@ -1280,7 +1280,7 @@ tracker() {
     </div>
 
     ${UI.panel(`All Applications (${apps.length})`, apps.length ? `
-      <table>
+      <div class="table-wrap"><table>
         <thead>
           <tr>
             <th>Role</th><th>Company</th><th>Match</th>
@@ -1296,7 +1296,7 @@ tracker() {
                 ${a.matchScore != null ? a.matchScore + '%' : '—'}
               </td>
               <td>
-                <select data-status="${a.id}" style="padding:4px 8px;font-size:12px;width:auto">
+                <select data-status="${a.id}" aria-label="Status for ${UI.escape(a.jobTitle || 'Untitled')} at ${UI.escape(a.company || 'Unknown')}" style="padding:4px 8px;font-size:12px;width:auto">
                   ${CONFIG.STATUSES.map(s => `
                     <option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>
                   `).join('')}
@@ -1307,7 +1307,7 @@ tracker() {
               <td><button class="btn-ghost" data-del-app="${a.id}">Delete</button></td>
             </tr>`).join('')}
         </tbody>
-      </table>
+      </table></div>
     ` : UI.empty('No applications yet. Analyze a job description to add one automatically.'))}
   `);
 

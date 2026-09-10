@@ -134,11 +134,14 @@ const UI = {
 
   /* Illustration card used beside a module's form (the approved
      HirePilot visual asset for that screen). Pass the image path
-     relative to index.html, e.g. 'img/02_resume_analysis.jpg'. */
-  visual(src, alt, caption = '') {
+     relative to index.html, e.g. 'img/02_resume_analysis.jpg'.
+     Set crop:true for the handful of source images that have a
+     filename caption baked into the bottom edge — see .crop-caption
+     in style.css. */
+  visual(src, alt, caption = '', crop = false) {
     return `
       <figure class="feature-visual">
-        <img src="${this.escape(src)}" alt="${this.escape(alt)}" loading="lazy">
+        <img src="${this.escape(src)}" alt="${this.escape(alt)}" loading="lazy" class="${crop ? 'crop-caption' : ''}">
         ${caption ? `<figcaption>${this.escape(caption)}</figcaption>` : ''}
       </figure>`;
   },
