@@ -563,6 +563,22 @@ tr:last-child td { border-bottom: none; }
   margin-top: 22px;
 }
 
+/* Auth screens (login/signup/reset) — reuse .panel, .btn, and the
+   standard input styles; only a max-width wrapper and a couple of
+   small text links are new. */
+.auth-card { max-width: 420px; }
+.auth-links { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+.link-btn {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  text-align: left;
+  font-size: 13px;
+  color: var(--blue);
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--blue-dark); text-decoration: underline; }
+
 .notice {
   margin-top: 16px;
   padding: 12px 14px;

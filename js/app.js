@@ -47,21 +47,68 @@ const App = {
 
   /* ---------- STARTUP ---------- */
 
-  init() {
+  async init() {
     this.fillDrawerIcons();
     this.bindNav();
     this.bindDrawer();
     this.bindSettings();
+    this.bindLogout();
+
+    if (!Auth.enabled()) {
+      // Supabase isn't configured (see js/supabase-client.js) —
+      // run exactly as before auth existed: no gate, local-only data.
+      this.enterApp();
+      return;
+    }
+
+    await Auth.init();
+    // Fires immediately with the current session (if the browser
+    // still has one from a previous visit), then again on every
+    // future sign-in/out/token-refresh.
+    Auth.onChange(user => this.handleAuthChange(user));
+  },
+
+  /* Distinguishes an actual sign-in/sign-out transition from a
+     background token refresh (Supabase fires onAuthStateChange for
+     those too, with the same user) — a refresh must NOT yank
+     someone back to Dashboard while they're mid-task. */
+  async handleAuthChange(user) {
+    const nowSignedIn = !!user;
+
+    if (nowSignedIn && !this._signedIn) {
+      this._signedIn = true;
+      document.getElementById('topbarNav').hidden = false;
+      await CloudSync.hydrate();
+      this.enterApp();
+    } else if (!nowSignedIn && this._signedIn) {
+      this._signedIn = false;
+      CloudSync.clearLocalCache();
+      document.getElementById('topbarNav').hidden = true;
+      AuthUI.login();
+    } else if (!nowSignedIn && this._signedIn === undefined) {
+      // First load, never signed in this session.
+      this._signedIn = false;
+      document.getElementById('topbarNav').hidden = true;
+      AuthUI.login();
+    }
+    // nowSignedIn && this._signedIn already true: a token refresh —
+    // intentionally does nothing, stay on whatever screen is open.
+  },
+
+  /* Enters the normal app (dashboard + mock-mode badge + first-run
+     nudge) — called once auth (if enabled) has resolved to "signed in",
+     or immediately when Supabase isn't configured at all. */
+  enterApp() {
     this.updateStatus();
 
     const mock = Config.aiMode() === 'mock';
     document.getElementById('mockBadge').hidden = !mock;
 
-    // Show the dashboard first.
     this.go('dashboard');
 
     // Nudge first-time users toward setting up their key — only
-    // relevant in live mode. Mock mode needs no key at all.
+    // relevant in live mode with no backend proxy yet. Mock mode
+    // needs no key at all.
     if (!mock && !Storage.hasApiKey()) {
       setTimeout(() => {
         UI.toast('Add your free Groq API key to get started — open the menu and choose API Settings.');
@@ -221,6 +268,24 @@ const App = {
         UI.toast('Connected. You are ready to go.', 'ok');
       } catch (err) {
         this.updateStatus();
+        UI.toast(err.message, 'err');
+      }
+    });
+  },
+
+  /* ---------- LOGOUT ---------- */
+
+  bindLogout() {
+    const btn = document.getElementById('logoutBtn');
+    if (!Auth.enabled()) return; // stays hidden — nothing to log out of
+    btn.hidden = false;
+
+    UI.busyClick(btn, 'Logging out...', async () => {
+      this.closeDrawer();
+      try {
+        await Auth.signOut();
+        UI.toast('Logged out.', 'ok');
+      } catch (err) {
         UI.toast(err.message, 'err');
       }
     });

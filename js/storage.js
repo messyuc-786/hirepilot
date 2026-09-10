@@ -56,12 +56,14 @@ const Storage = {
   addResume(resume) {
     const all = this.getResumes();
     // newest first, so the most recent resume is always index 0
-    all.unshift({
+    const record = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       ...resume,
-    });
+    };
+    all.unshift(record);
     this.set(CONFIG.KEYS.RESUMES, all);
+    CloudSync?.push('resumes', 'upsert', record);
     return all[0];
   },
 
@@ -71,6 +73,7 @@ const Storage = {
 
   deleteResume(id) {
     this.set(CONFIG.KEYS.RESUMES, this.getResumes().filter(r => r.id !== id));
+    CloudSync?.push('resumes', 'delete', { id });
   },
 
   /* ---------- APPLICATIONS ---------- */
@@ -79,22 +82,28 @@ const Storage = {
 
   addApplication(app) {
     const all = this.getApplications();
-    all.unshift({
+    const record = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       status: 'applied',
       notes: '',
       ...app,
-    });
+    };
+    all.unshift(record);
     this.set(CONFIG.KEYS.APPLICATIONS, all);
+    CloudSync?.push('applications', 'upsert', record);
     return all[0];
   },
 
   updateApplication(id, changes) {
-    const all = this.getApplications().map(a =>
-      a.id === id ? { ...a, ...changes } : a
-    );
+    let updated = null;
+    const all = this.getApplications().map(a => {
+      if (a.id !== id) return a;
+      updated = { ...a, ...changes };
+      return updated;
+    });
     this.set(CONFIG.KEYS.APPLICATIONS, all);
+    if (updated) CloudSync?.push('applications', 'upsert', updated);
   },
 
   deleteApplication(id) {
@@ -102,6 +111,7 @@ const Storage = {
       CONFIG.KEYS.APPLICATIONS,
       this.getApplications().filter(a => a.id !== id)
     );
+    CloudSync?.push('applications', 'delete', { id });
   },
 
   /* ---------- INTERVIEWS ---------- */
@@ -110,12 +120,14 @@ const Storage = {
 
   addInterview(interview) {
     const all = this.getInterviews();
-    all.unshift({
+    const record = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
       ...interview,
-    });
+    };
+    all.unshift(record);
     this.set(CONFIG.KEYS.INTERVIEWS, all);
+    CloudSync?.push('interviews', 'upsert', record);
     return all[0];
   },
 
