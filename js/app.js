@@ -137,6 +137,17 @@ const App = {
   },
 
   go(view) {
+    // Defense in depth: the hamburger/quick-actions are already
+    // hidden while signed out, so this path only matters against a
+    // direct App.go(...) call (e.g. from devtools) — it renders no
+    // real data (the local cache is cleared on sign-out) and no AI
+    // call can succeed unauthenticated (see API.ask()), but the
+    // screen itself shouldn't render at all without a session.
+    if (Auth.enabled() && !Auth.isSignedIn()) {
+      AuthUI.login();
+      return;
+    }
+
     const route = this.routes[view];
     if (!route) {
       console.warn(`Unknown view: ${view}`);

@@ -622,12 +622,13 @@ tr:last-child td { border-bottom: none; }
   width: 100%; height: 100%; object-fit: cover;
   /* The source photo is a full composited mockup — header, its own
      headline/bullets, a login-card mockup, and a footer all baked
-     in. object-fit:cover alone can only crop ONE axis per an aspect
-     mismatch; a uniform zoom crops the other axis too, isolating
-     just the illustration (girl + desk) and excluding all of that
-     baked-in chrome. */
-  transform: scale(5, 1.5);
-  transform-origin: 40% 45%;
+     in. A uniform zoom (equal x/y scale) isolates just the
+     illustration (girl + desk) and excludes that baked-in chrome
+     without distorting the picture — a non-uniform scale here
+     visibly stretches/warps the image, which is what "zoom" must
+     never do. */
+  transform: scale(2.3);
+  transform-origin: 38% 48%;
 }
 
 .auth-bullets { display: flex; flex-direction: column; gap: 10px; }
