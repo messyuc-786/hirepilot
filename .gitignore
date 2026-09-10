@@ -22,6 +22,11 @@ dist/
 build/
 .cache/
 
+# --- SUPABASE CLI LOCAL STATE ---
+# Machine-specific cache from `supabase link`/`functions deploy` —
+# not secrets, but local-only and never meant to be shared.
+supabase/.temp/
+
 # --- EDITOR SETTINGS ---
 .vscode/
 .idea/

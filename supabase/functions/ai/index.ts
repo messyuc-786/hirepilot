@@ -92,7 +92,7 @@ Deno.serve(async (req: Request) => {
         'Authorization': `Bearer ${groqKey}`,
       },
       body: JSON.stringify({
-        model: typeof body.model === 'string' ? body.model : 'llama-3.3-70b-versatile',
+        model: typeof body.model === 'string' ? body.model : 'openai/gpt-oss-120b',
         max_tokens: typeof body.max_tokens === 'number' ? body.max_tokens : 3000,
         temperature: typeof body.temperature === 'number' ? body.temperature : 0.3,
         messages,

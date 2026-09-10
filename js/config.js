@@ -22,7 +22,7 @@ const CONFIG = {
   // interactively during development without editing this file.
   AI_MODE: 'live',
 
-  DEFAULT_MODEL: 'llama-3.3-70b-versatile',
+  DEFAULT_MODEL: 'openai/gpt-oss-120b',
 
   // How long the AI's answer can be. Higher = more detail, slower.
   MAX_TOKENS: 3000,
