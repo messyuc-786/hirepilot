@@ -24,6 +24,11 @@ const CONFIG = {
 
   DEFAULT_MODEL: 'openai/gpt-oss-120b',
 
+  // Models currently offered in AI Settings (index.html #modelSelect).
+  // Storage.getModel() validates against this list before trusting a
+  // cached localStorage value — see the note there for why.
+  AVAILABLE_MODELS: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b'],
+
   // How long the AI's answer can be. Higher = more detail, slower.
   MAX_TOKENS: 3000,
 

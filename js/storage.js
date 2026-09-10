@@ -42,8 +42,20 @@ const Storage = {
 
   /* Model preference only — no provider key is ever stored here.
      Live-mode AI requests are authenticated with the user's
-     Supabase session instead (see js/api.js, supabase/functions/ai). */
-  getModel()       { return this.get(CONFIG.KEYS.MODEL, CONFIG.DEFAULT_MODEL); },
+     Supabase session instead (see js/api.js, supabase/functions/ai).
+
+     Validated against CONFIG.AVAILABLE_MODELS before use: a browser
+     that cached a model id from before a provider-side migration
+     (e.g. Groq retiring llama-3.1-8b-instant / llama-3.3-70b-versatile
+     to its Enterprise tier) would otherwise keep sending that dead
+     id forever and 404 on every live request, with no way to
+     self-recover short of the user manually reopening AI Settings
+     and picking a model again. Falling back to CONFIG.DEFAULT_MODEL
+     for anything not currently offered heals that automatically. */
+  getModel() {
+    const saved = this.get(CONFIG.KEYS.MODEL, CONFIG.DEFAULT_MODEL);
+    return CONFIG.AVAILABLE_MODELS.includes(saved) ? saved : CONFIG.DEFAULT_MODEL;
+  },
   setModel(m)      { return this.set(CONFIG.KEYS.MODEL, m); },
 
   /* ---------- RESUMES ---------- */
