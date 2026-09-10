@@ -100,7 +100,7 @@ const App = {
       if (e.key === 'Escape' && !modal.hidden) close();
     });
 
-    document.getElementById('saveSettings').addEventListener('click', async () => {
+    UI.busyClick(document.getElementById('saveSettings'), 'Testing...', async () => {
       const key = keyIn.value.trim();
 
       if (!key) {

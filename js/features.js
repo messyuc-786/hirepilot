@@ -137,8 +137,7 @@ resume() {
     }
   });
 
-  document.getElementById('analyzeBtn')
-    ?.addEventListener('click', () => this.runResume());
+  UI.busyClick(document.getElementById('analyzeBtn'), 'Analyzing...', () => this.runResume());
 
   // delete buttons
   document.querySelectorAll('[data-del-resume]').forEach(btn => {
@@ -277,8 +276,7 @@ jd() {
     <div id="jdResult"></div>
   `);
 
-  document.getElementById('jdBtn')
-    ?.addEventListener('click', () => this.runJD());
+  UI.busyClick(document.getElementById('jdBtn'), 'Analyzing...', () => this.runJD());
 },
 
 async runJD() {
@@ -409,8 +407,7 @@ optimizer() {
     <div id="optResult"></div>
   `);
 
-  document.getElementById('optBtn')
-    ?.addEventListener('click', () => this.runOptimizer());
+  UI.busyClick(document.getElementById('optBtn'), 'Optimizing...', () => this.runOptimizer());
 },
 
 async runOptimizer() {
@@ -521,8 +518,7 @@ linkedin() {
     <div id="liResult"></div>
   `);
 
-  document.getElementById('liBtn')
-    ?.addEventListener('click', () => this.runLinkedIn());
+  UI.busyClick(document.getElementById('liBtn'), 'Reviewing...', () => this.runLinkedIn());
 },
 
 async runLinkedIn() {
@@ -642,8 +638,7 @@ cover() {
     <div id="clResult"></div>
   `);
 
-  document.getElementById('clBtn')
-    ?.addEventListener('click', () => this.runCover());
+  UI.busyClick(document.getElementById('clBtn'), 'Writing...', () => this.runCover());
 },
 
 async runCover() {
@@ -768,8 +763,7 @@ interview() {
     `) : ''}
   `);
 
-  document.getElementById('ivStart')
-    ?.addEventListener('click', () => this.startInterview());
+  UI.busyClick(document.getElementById('ivStart'), 'Preparing...', () => this.startInterview());
 },
 
 async startInterview() {
@@ -850,7 +844,7 @@ showQuestion() {
     </div>
   `);
 
-  document.getElementById('ivNext').addEventListener('click', () => {
+  UI.busyClick(document.getElementById('ivNext'), null, async () => {
     const answer = document.getElementById('ivAnswer').value.trim();
     if (answer.length < 20) {
       UI.toast('Give a fuller answer — at least 20 characters.', 'err');
@@ -863,7 +857,7 @@ showQuestion() {
     if (iv.current < iv.questions.length) {
       this.showQuestion();
     } else {
-      this.gradeInterview();
+      await this.gradeInterview();
     }
   });
 },
@@ -996,8 +990,7 @@ gap() {
     <div id="gapResult"></div>
   `);
 
-  document.getElementById('gapBtn')
-    ?.addEventListener('click', () => this.runGap());
+  UI.busyClick(document.getElementById('gapBtn'), 'Mapping...', () => this.runGap());
 },
 
 async runGap() {
@@ -1111,8 +1104,7 @@ recruiter() {
     <div id="recResult"></div>
   `);
 
-  document.getElementById('recBtn')
-    ?.addEventListener('click', () => this.runRecruiter());
+  UI.busyClick(document.getElementById('recBtn'), 'Reading...', () => this.runRecruiter());
 },
 
 async runRecruiter() {

@@ -82,25 +82,39 @@ const UI = {
       </div>`;
   },
 
+  /* Coerce a value that SHOULD be an array (AI responses sometimes
+     return a single string, an object, or null instead) into one,
+     so a malformed shape degrades to "None found" instead of a
+     silent-empty render or a thrown error. Logs so it's visible
+     during testing that the model drifted from the requested schema. */
+  toArray(items, context = '') {
+    if (Array.isArray(items)) return items;
+    if (items === null || items === undefined || items === '') return [];
+    console.warn(`Expected an array${context ? ` for "${context}"` : ''} but got:`, items);
+    return [items];
+  },
+
   /* Bulleted list. colour: '' | 'cyan' | 'red' */
   list(items, colour = '') {
-    if (!Array.isArray(items) || !items.length) {
+    const arr = this.toArray(items, 'list');
+    if (!arr.length) {
       return `<p class="muted">None found.</p>`;
     }
     return `
       <ul class="list ${colour}">
-        ${items.map(i => `<li>${this.escape(i)}</li>`).join('')}
+        ${arr.map(i => `<li>${this.escape(i)}</li>`).join('')}
       </ul>`;
   },
 
   /* Chips. variant: '' | 'good' | 'miss' */
   tags(items, variant = '') {
-    if (!Array.isArray(items) || !items.length) {
+    const arr = this.toArray(items, 'tags');
+    if (!arr.length) {
       return `<p class="muted">None found.</p>`;
     }
     return `
       <div class="tags">
-        ${items.map(i => `<span class="tag ${variant}">${this.escape(i)}</span>`).join('')}
+        ${arr.map(i => `<span class="tag ${variant}">${this.escape(i)}</span>`).join('')}
       </div>`;
   },
 
@@ -141,5 +155,30 @@ const UI = {
   /* Fill the main content area. */
   render(html) {
     document.getElementById('views').innerHTML = html;
+  },
+
+  /* ---------- ASYNC BUTTON GUARD ----------
+     Wraps a button's click handler so a second click while the first
+     request is still in flight is ignored, instead of firing a
+     duplicate API call (and, in features that save to Storage, a
+     duplicate saved record). Disables + relabels the button while
+     busy, then always restores it, success or failure. */
+  busyClick(btn, busyLabel, handler) {
+    if (!btn) return;
+    let busy = false;
+    const original = btn.textContent;
+    btn.addEventListener('click', async () => {
+      if (busy) return;
+      busy = true;
+      btn.disabled = true;
+      if (busyLabel) btn.textContent = busyLabel;
+      try {
+        await handler();
+      } finally {
+        busy = false;
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
   },
 };
