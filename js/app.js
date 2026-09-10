@@ -173,7 +173,32 @@ const App = {
 
     document.getElementById('helpBtn')?.addEventListener('click', () => {
       this.closeDrawer();
-      UI.toast('Check the README in the project for help and FAQs.');
+      this.openInfoModal('helpModal');
+    });
+
+    document.getElementById('aboutBtn')?.addEventListener('click', () => {
+      this.closeDrawer();
+      this.openInfoModal('aboutModal');
+    });
+
+    this.bindInfoModal('helpModal', 'closeHelp');
+    this.bindInfoModal('aboutModal', 'closeAbout');
+  },
+
+  /* ---------- HELP / ABOUT (simple info modals) ---------- */
+
+  openInfoModal(id) {
+    document.getElementById(id).hidden = false;
+  },
+
+  bindInfoModal(modalId, closeBtnId) {
+    const modal = document.getElementById(modalId);
+    const close = () => { modal.hidden = true; };
+
+    document.getElementById(closeBtnId).addEventListener('click', close);
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !modal.hidden) close();
     });
   },
 

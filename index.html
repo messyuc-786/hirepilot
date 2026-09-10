@@ -103,6 +103,7 @@
     <div class="drawer-foot">
       <button class="drawer-foot-btn" id="settingsBtn">AI Settings</button>
       <button class="drawer-foot-btn" id="helpBtn">Help</button>
+      <button class="drawer-foot-btn" id="aboutBtn">About</button>
       <button class="drawer-foot-btn" id="logoutBtn" hidden>Log Out</button>
     </div>
   </nav>
@@ -131,6 +132,76 @@
       <div class="modal-actions">
         <button class="btn-ghost" id="cancelSettings">Cancel</button>
         <button class="btn" id="saveSettings">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HELP MODAL ============ -->
+  <div class="modal" id="helpModal" hidden>
+    <div class="modal-box modal-box-lg">
+      <h2>Help</h2>
+
+      <h3>Getting Started</h3>
+      <p class="muted">
+        Analyze a resume first — most other tools compare against it.
+        Then paste a job description to see your match score, and use
+        the hamburger menu (top right) any time to jump to another tool.
+      </p>
+
+      <h3>Using the Tools</h3>
+      <p class="muted">
+        Each tool follows the same pattern: fill in the form, click the
+        primary button, and read the results below. Resume Analyzer,
+        Resume Optimizer, and Cover Letter never invent experience —
+        they only work with what's already in your resume.
+      </p>
+
+      <h3>Mock vs. Live AI</h3>
+      <p class="muted">
+        A "Mock Mode" badge in the header means responses are simulated
+        for testing — no real AI request is made. Without that badge,
+        you're in live mode: real AI analysis, handled securely by
+        HirePilot's backend. You never need to manage an API key.
+      </p>
+
+      <h3>Job Tracker</h3>
+      <p class="muted">
+        Applications you analyze a job description for are added here
+        automatically. Add others manually, update their status as you
+        move through interviews, and delete any you no longer need.
+      </p>
+
+      <h3>Account</h3>
+      <p class="muted">
+        Your data is tied to your account and available wherever you
+        log in. Use the drawer's Log Out to sign out of this device.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn" id="closeHelp">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ABOUT MODAL ============ -->
+  <div class="modal" id="aboutModal" hidden>
+    <div class="modal-box">
+      <div class="about-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21.7 2.3 2.6 9.8c-.8.3-.8 1.5.1 1.7l6.9 1.9 1.9 6.9c.2.9 1.4.9 1.7.1l7.5-19.1c.3-.7-.4-1.4-1.1-1z" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2>HirePilot</h2>
+      <p class="about-tagline">Plan. Prepare. Get Hired.</p>
+      <p class="muted">
+        HirePilot is an AI-powered career workspace — analyze your resume,
+        match it against real job descriptions, optimize your LinkedIn
+        profile and cover letters, practice interviews, and track every
+        application in one place.
+      </p>
+      <div class="notice">Created by Urvashi Chandan</div>
+      <div class="modal-actions">
+        <button class="btn" id="closeAbout">Close</button>
       </div>
     </div>
   </div>

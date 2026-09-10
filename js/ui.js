@@ -93,15 +93,16 @@ const UI = {
       quote: "Every application is a step. Keep track of where you're going." },
   },
 
-  /* Compact module header: label, title, one-line description, and
-     a short contextual quote — replaces UI.head() on the nine
-     feature screens. Look up by view name (e.g. UI.moduleHead('resume')). */
+  /* Compact module header: title, one-line description, and a
+     short contextual quote — replaces UI.head() on the nine feature
+     screens. Look up by view name (e.g. UI.moduleHead('resume')).
+     m.num (e.g. "01") is kept in MODULES purely as internal data —
+     no longer rendered; user-facing screens show only the title. */
   moduleHead(view) {
     const m = this.MODULES[view];
     if (!m) return '';
     return `
       <div class="view-head module-head">
-        <div class="eyebrow">Module ${m.num}</div>
         <h1>${this.escape(m.title)}</h1>
         <p class="muted">${this.escape(m.desc)}</p>
         <p class="module-quote">${this.escape(m.quote)}</p>

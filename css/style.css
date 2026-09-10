@@ -563,7 +563,23 @@ tr:last-child td { border-bottom: none; }
   padding: 28px;
   width: 100%;
   max-width: 460px;
+  max-height: 86vh;
+  overflow-y: auto;
 }
+.modal-box-lg { max-width: 560px; }
+.modal-box h3 { margin-top: 18px; }
+.modal-box h3:first-of-type { margin-top: 4px; }
+
+.about-mark {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+.about-mark svg { width: 22px; height: 22px; }
+.about-tagline { color: var(--blue); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 14px; }
 
 .modal-actions {
   display: flex;
@@ -572,21 +588,63 @@ tr:last-child td { border-bottom: none; }
   margin-top: 22px;
 }
 
-/* Auth screens (login/signup/reset) — reuse .panel, .btn, and the
-   standard input styles; only a max-width wrapper and a couple of
-   small text links are new. .auth-page centers the whole thing in
-   the viewport instead of leaving it stuck top-left of a mostly
-   empty page (the default flow every other screen uses, which
-   makes sense when there's a full page of content below, not here). */
-.auth-page {
-  max-width: 420px;
-  margin: 0 auto;
-  min-height: 56vh;
+/* Auth screens (login/signup/reset) — a career-illustration column
+   beside the auth card, echoing the Home hero rather than a bare
+   centered form. One shared shell (AuthUI._shell in auth-ui.js) so
+   all three screens only differ in their form content. */
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+  min-height: 74vh;
+  padding: 8px 0 20px;
+}
+
+.auth-visual-col {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 22px;
 }
-.auth-card { max-width: 420px; }
+.auth-visual-col .eyebrow { margin-bottom: 8px; }
+.auth-visual-col h1 { font-size: 34px; line-height: 1.12; margin-bottom: 10px; }
+.auth-visual-col > p.muted { font-size: 15px; max-width: 40ch; }
+
+.auth-visual-img {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  aspect-ratio: 3 / 2;
+}
+.auth-visual-img img {
+  width: 100%; height: 100%; object-fit: cover;
+  /* The source photo is a full composited mockup — header, its own
+     headline/bullets, a login-card mockup, and a footer all baked
+     in. object-fit:cover alone can only crop ONE axis per an aspect
+     mismatch; a uniform zoom crops the other axis too, isolating
+     just the illustration (girl + desk) and excluding all of that
+     baked-in chrome. */
+  transform: scale(5, 1.5);
+  transform-origin: 40% 45%;
+}
+
+.auth-bullets { display: flex; flex-direction: column; gap: 10px; }
+.auth-bullets .bullet { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text); font-weight: 500; }
+.auth-bullets .bullet svg { color: var(--blue); flex-shrink: 0; }
+
+.auth-quote {
+  font-size: 13.5px;
+  font-style: italic;
+  color: var(--text);
+  background: var(--tint);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.auth-form-col { display: flex; flex-direction: column; justify-content: center; }
+.auth-card { max-width: 420px; width: 100%; }
 .auth-links { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
 .link-btn {
   background: none;
@@ -598,6 +656,15 @@ tr:last-child td { border-bottom: none; }
   cursor: pointer;
 }
 .link-btn:hover { color: var(--blue-dark); text-decoration: underline; }
+
+/* Small, tasteful attribution — auth/info screens only, never
+   repeated inside the working app. */
+.app-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 18px 0 4px;
+}
 
 .notice {
   margin-top: 16px;
@@ -903,6 +970,12 @@ tr:last-child td { border-bottom: none; }
   .hero-copy h1 { font-size: 29px; }
   .hero-visual { order: -1; height: 200px; min-height: 0; }
   .hero-strip { grid-template-columns: repeat(2, 1fr); gap: 14px 18px; padding: 18px 20px; }
+
+  .auth-shell { grid-template-columns: 1fr; min-height: 0; gap: 20px; padding: 4px 0 12px; }
+  .auth-visual-col { order: -1; gap: 14px; }
+  .auth-visual-img { aspect-ratio: 16 / 9; }
+  .auth-visual-col h1 { font-size: 26px; }
+  .auth-bullets { display: none; } /* keep mobile compact — the form is the priority */
 }
 
 @media (max-width: 480px) {
@@ -918,6 +991,9 @@ tr:last-child td { border-bottom: none; }
   .stats-row > div { border-right: none !important; border-bottom: 1px solid var(--line); }
   .stats-row > div:last-child { border-bottom: none; }
   .progress-panel > div:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+  .auth-visual-img { aspect-ratio: 16 / 8; }
+  .auth-visual-col h1 { font-size: 23px; }
+  .auth-quote { display: none; }
 
   .progress-line .pl-label { width: 92px; font-size: 10px; }
 
