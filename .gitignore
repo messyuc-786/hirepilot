@@ -47,3 +47,9 @@ npm-debug.log*
 my-resume.pdf
 test-resume.*
 /personal/
+
+# --- QA ARTIFACTS ---
+# Local screenshot packs and one-off audit tooling — not app code,
+# not project documentation, never meant to be shared.
+/screenshots/
+/scripts/
