@@ -21,6 +21,11 @@
    result looks wrong, the prompt is the first thing to edit.
    ============================================================ */
 
+// Career Gap's response-shape normalization (gapToText,
+// gapToStringArray, gapNormalizeRoadmap) lives in js/gap-normalize.js
+// — loaded as a global before this file — so it has no DOM
+// dependency and is unit-testable on its own (test/gap-normalize.test.mjs).
+
 const Features = {
 
 /* ============================================================
@@ -1103,13 +1108,29 @@ Respond with ONLY a JSON object in this exact shape:
 }`;
 
   try {
-    const r = await API.ask(system,
+    const raw = await API.ask(system,
       `RESUME:\n${resume.text}\n\n---\n\nTARGET ROLE:\n${app.jdText}`);
+    // Model responses occasionally drift from the requested shape
+    // (an object instead of a bare string, {phases:[...]} instead of
+    // a bare roadmap array) — normalize before rendering so that
+    // shows as readable text or a real empty state, never
+    // "[object Object]" or a false "no data" message. See
+    // gapToText/gapToStringArray/gapNormalizeRoadmap above.
+    const r = {
+      readiness_score: raw?.readiness_score,
+      readiness_verdict: gapToText(raw?.readiness_verdict),
+      time_estimate: gapToText(raw?.time_estimate),
+      skills_have: gapToStringArray(raw?.skills_have),
+      skills_needed: gapToStringArray(raw?.skills_needed),
+      certifications_missing: gapToStringArray(raw?.certifications_missing),
+      roadmap: gapNormalizeRoadmap(raw?.roadmap),
+      quick_wins: gapToStringArray(raw?.quick_wins),
+    };
 
     out.innerHTML = `
       ${UI.panel('', `
         ${UI.score(r.readiness_score, 'Readiness for this role')}
-        <p class="muted" style="margin-top:12px">${UI.escape(r.readiness_verdict || '')}</p>
+        <p class="muted" style="margin-top:12px">${UI.escape(r.readiness_verdict)}</p>
         <p class="muted" style="margin-top:6px">
           <strong>Estimated time to competitive:</strong> ${UI.escape(r.time_estimate || '—')}
         </p>
@@ -1122,7 +1143,7 @@ Respond with ONLY a JSON object in this exact shape:
 
       ${UI.panel('Certifications Worth Getting', UI.list(r.certifications_missing))}
 
-      ${UI.panel('Learning Roadmap', (r.roadmap || []).map(p => `
+      ${UI.panel('Learning Roadmap', r.roadmap.map(p => `
         <div style="padding:18px 0;border-bottom:1px solid var(--line)">
           <div class="eyebrow">${UI.escape(p.phase)}</div>
           <h3>${UI.escape(p.focus)}</h3>

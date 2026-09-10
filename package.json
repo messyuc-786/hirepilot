@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "commonjs",
+  "description": "No build step, no dependencies — this file exists only to stop Node's module resolution from inheriting \"type\": \"module\" (or any other setting) from an unrelated package.json in a parent directory when running test/*.test.mjs with `node --test`. The app itself still loads every js/*.js file as a plain <script> tag; nothing here affects the browser."
+}
