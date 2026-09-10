@@ -28,8 +28,11 @@ const Features = {
    ============================================================ */
 dashboard() {
   const s = Storage.getStats();
-  const apps = Storage.getApplications().slice(0, 5);
+  const allApps = Storage.getApplications();
+  const apps = allApps.slice(0, 5);
   const isNew = s.resumes === 0 && s.applications === 0;
+  const activeApps = allApps.filter(a => a.status === 'applied' || a.status === 'interview').length;
+  const resumeScore = Storage.getResumes()[0]?.analysis?.strength_score ?? null;
 
   UI.render(`
     <section class="hero">
@@ -66,14 +69,21 @@ dashboard() {
       </div>
     </section>
 
-    ${UI.panel('Your Snapshot', `
-      <div class="stats-row snapshot-row">
-        <div><div class="stat-label">Resumes</div><div class="stat-value">${s.resumes}</div></div>
-        <div><div class="stat-label">Applications</div><div class="stat-value">${s.applications}</div></div>
-        <div><div class="stat-label">Interviews</div><div class="stat-value cyan">${s.interviews}</div></div>
-        <div><div class="stat-label">Offers</div><div class="stat-value cyan">${s.offers}</div></div>
-        <div><div class="stat-label">Success Rate</div><div class="stat-value">${s.successRate}%</div></div>
-        <div><div class="stat-label">Avg. Interview</div><div class="stat-value cyan">${s.avgInterviewScore}</div></div>
+    ${UI.panel('Career Progress', `
+      <div class="progress-lines">
+        <div class="progress-line">
+          <span class="pl-label">Resume Strength</span>
+          <div class="bar"><span style="width:${resumeScore ?? 0}%"></span></div>
+          <span class="pl-value">${resumeScore ?? '—'}</span>
+        </div>
+        <div class="progress-line">
+          <span class="pl-label">Applications</span>
+          <span class="pl-value-text">${s.applications ? `${s.applications} tracked · ${activeApps} active` : 'None yet'}</span>
+        </div>
+        <div class="progress-line">
+          <span class="pl-label">Interviews</span>
+          <span class="pl-value-text">${s.interviews ? `${s.interviews} completed · avg ${s.avgInterviewScore}/100` : 'None yet'}</span>
+        </div>
       </div>
     `)}
 
@@ -113,7 +123,12 @@ dashboard() {
             </tr>`).join('')}
         </tbody>
       </table></div>
-    ` : UI.empty('Nothing tracked yet. Analyze a job description to add your first application.'))}
+    ` : `
+      <div class="empty-cta">
+        <p class="muted">No activity yet. Start with your resume or a job.</p>
+        <button class="btn" data-go="resume">Analyze Resume</button>
+      </div>
+    `)}
   `);
 
   document.getElementById('heroGetStarted')
@@ -136,8 +151,7 @@ resume() {
   const saved = Storage.getResumes();
 
   UI.render(`
-    ${UI.head('Module 01', 'Resume Analyzer',
-      'Upload your resume for a full breakdown: skills, ATS compatibility, and gaps.')}
+    ${UI.moduleHead('resume')}
 
     <div class="split" style="margin-bottom:18px">
       ${UI.panel('Upload', `
@@ -290,8 +304,7 @@ jd() {
   const resumes = Storage.getResumes();
 
   UI.render(`
-    ${UI.head('Module 02', 'Job Description Analyzer',
-      'Break down what a job actually asks for, and how well you match it.')}
+    ${UI.moduleHead('jd')}
 
     <div class="split" style="margin-bottom:18px">
       ${!resumes.length ? UI.panel('', UI.empty(
@@ -424,8 +437,7 @@ optimizer() {
   const apps    = Storage.getApplications();
 
   UI.render(`
-    ${UI.head('Module 03', 'Resume Optimizer',
-      'Rewrite your bullets to be stronger and better targeted, using only what you have actually done.')}
+    ${UI.moduleHead('optimizer')}
 
     ${UI.panel('', `
       <div class="notice" style="border-left-color:var(--amber);margin-top:0">
@@ -543,8 +555,7 @@ linkedin() {
   const apps = Storage.getApplications();
 
   UI.render(`
-    ${UI.head('Module 04', 'LinkedIn Optimizer',
-      'Make your profile findable by recruiters searching for your skills.')}
+    ${UI.moduleHead('linkedin')}
 
     <div class="split" style="margin-bottom:18px">
       ${UI.panel('Your Profile', `
@@ -661,8 +672,7 @@ cover() {
   const apps    = Storage.getApplications();
 
   UI.render(`
-    ${UI.head('Module 05', 'Cover Letter Generator',
-      'A letter built from your real background and this specific job.')}
+    ${UI.moduleHead('cover')}
 
     <div class="split" style="margin-bottom:18px">
       ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
@@ -775,8 +785,7 @@ interview() {
   const past    = Storage.getInterviews();
 
   UI.render(`
-    ${UI.head('Module 06', 'Mock Interview',
-      'Practice with questions built from your actual resume and target job.')}
+    ${UI.moduleHead('interview')}
 
     <div class="split" style="margin-bottom:18px">
       ${!resumes.length ? UI.panel('', UI.empty(
@@ -1027,8 +1036,7 @@ gap() {
   const apps    = Storage.getApplications();
 
   UI.render(`
-    ${UI.head('Module 07', 'Career Gap Analysis',
-      'What stands between you and the role you want, and how to close it.')}
+    ${UI.moduleHead('gap')}
 
     <div class="split" style="margin-bottom:18px">
       ${!resumes.length || !apps.length ? UI.panel('', UI.empty(
@@ -1143,8 +1151,7 @@ recruiter() {
   const apps    = Storage.getApplications();
 
   UI.render(`
-    ${UI.head('Module 08', 'Recruiter View',
-      'What a recruiter notices in the first thirty seconds, including the things you would rather they did not.')}
+    ${UI.moduleHead('recruiter')}
 
     <div class="split" style="margin-bottom:18px">
       ${!resumes.length ? UI.panel('', UI.empty('Analyze a resume first.'))
@@ -1248,8 +1255,7 @@ tracker() {
   const apps = Storage.getApplications();
 
   UI.render(`
-    ${UI.head('Module 09', 'Job Tracker',
-      'Every application, every round, every follow-up.')}
+    ${UI.moduleHead('tracker')}
 
     <div class="split split-compact" style="margin-bottom:18px">
       ${UI.panel('Add Application Manually', `

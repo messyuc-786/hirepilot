@@ -264,7 +264,7 @@ img { display: block; max-width: 100%; }
 /* ---------- 4. MAIN AREA ---------- */
 .main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 70px; width: 100%; }
 
-.view-head { margin-bottom: 26px; }
+.view-head { margin-bottom: 22px; }
 
 .eyebrow {
   font-size: 11px;
@@ -272,14 +272,29 @@ img { display: block; max-width: 100%; }
   letter-spacing: 1.4px;
   text-transform: uppercase;
   color: var(--blue);
-  margin-bottom: 7px;
+  margin-bottom: 9px;
 }
 
-h1 { font-size: 29px; font-weight: 750; letter-spacing: -.4px; color: var(--navy); }
+h1 { font-size: 29px; font-weight: 750; letter-spacing: -.4px; color: var(--navy); margin-bottom: 9px; }
 h2 { font-size: 17px; font-weight: 650; margin-bottom: 12px; color: var(--navy); }
 h3 { font-size: 14.5px; font-weight: 650; margin-bottom: 8px; color: var(--navy); }
 
 .muted { color: var(--muted); font-size: 13.5px; }
+
+/* Module header: label + title + one-line description + a short
+   contextual quote, replacing what used to be a big empty gap
+   before the work area. The quote is part of the header, not a
+   card — a thin blue rule and italic type are the only accents. */
+.module-head .muted { margin-bottom: 16px; max-width: 64ch; }
+.module-quote {
+  font-size: 15.5px;
+  font-style: italic;
+  color: var(--text);
+  border-left: 2px solid var(--blue);
+  padding-left: 13px;
+  line-height: 1.5;
+  max-width: 58ch;
+}
 
 /* ---------- 5. PANELS / CARDS ---------- */
 .panel {
@@ -590,6 +605,34 @@ tr:last-child td { border-bottom: none; }
   font-size: 13.5px;
 }
 
+/* Compact empty state with a real next action, used on the
+   dashboard's Recent Applications panel when there's nothing yet. */
+.empty-cta { text-align: center; padding: 28px 20px; }
+.empty-cta p { margin-bottom: 14px; }
+
+/* Career Progress — three narrow lines instead of stat cards. */
+.progress-lines { display: flex; flex-direction: column; gap: 16px; }
+.progress-line { display: flex; align-items: center; gap: 12px; }
+.progress-line .pl-label {
+  width: 128px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+}
+.progress-line .bar { flex: 1; margin: 0; }
+.progress-line .pl-value {
+  width: 30px;
+  flex-shrink: 0;
+  text-align: right;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--navy);
+}
+.progress-line .pl-value-text { font-size: 13.5px; color: var(--text); }
+
 /* ---------- 13. HERO (Dashboard first screen) ----------
    The 3D artwork bleeds edge-to-edge in its own column instead of
    sitting as a letterboxed, inset thumbnail — it's the emotional
@@ -755,7 +798,7 @@ tr:last-child td { border-bottom: none; }
    than re-export the assets, zoom slightly and anchor to the top so
    the caption strip is pushed below the visible frame and cropped
    by the card's overflow:hidden. */
-.crop-caption { transform: scale(1.32); transform-origin: 50% 0%; }
+.crop-caption { transform: scale(1.5); transform-origin: 50% 0%; }
 
 .feature-visual figcaption {
   padding: 14px 16px;
@@ -811,13 +854,15 @@ tr:last-child td { border-bottom: none; }
   .hero-copy p { margin-bottom: 16px; }
   .hero-strip { grid-template-columns: 1fr; gap: 12px; padding: 16px 18px; }
   .btn-lg { width: 100%; text-align: center; }
-  .quick-actions, .progress-panel, .stats-row { grid-template-columns: 1fr; }
+  /* Quick Actions stay a compact 2-up grid even on small phones —
+     three/four full-width cards would be the "giant card" feel
+     this pass is explicitly removing. */
+  .quick-actions, .progress-panel, .stats-row { grid-template-columns: repeat(2, 1fr); }
   .stats-row > div { border-right: none !important; border-bottom: 1px solid var(--line); }
   .stats-row > div:last-child { border-bottom: none; }
   .progress-panel > div:first-child { border-right: none; border-bottom: 1px solid var(--line); }
-  .snapshot-row { grid-template-columns: repeat(2, 1fr); }
-  .snapshot-row > div:nth-child(2n) { border-right: none; }
-  .snapshot-row > div:not(:nth-last-child(-n+2)) { border-bottom: 1px solid var(--line); }
+
+  .progress-line .pl-label { width: 92px; font-size: 10px; }
 
   /* Near-full-width drawer on small phones, per spec. */
   .drawer { width: 100vw; max-width: 100vw; border-left: none; }

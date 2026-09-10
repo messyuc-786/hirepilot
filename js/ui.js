@@ -60,6 +60,54 @@ const UI = {
       </div>`;
   },
 
+  /* One place holding each module's label, title, description, and
+     contextual quote — so the header markup below is written once
+     and every screen just looks itself up by view name. */
+  MODULES: {
+    resume:    { num: '01', title: 'Resume Analyzer',
+      desc: 'Upload your resume for a full breakdown: skills, ATS compatibility, and gaps.',
+      quote: 'Your resume opens the door. Make sure it tells your story.' },
+    jd:        { num: '02', title: 'Job Description Analyzer',
+      desc: 'Break down what a job actually asks for, and how well you match it.',
+      quote: 'The right opportunity starts with understanding what it asks for.' },
+    optimizer: { num: '03', title: 'Resume Optimizer',
+      desc: 'Rewrite your bullets to be stronger and better targeted, using only what you have actually done.',
+      quote: 'Small improvements can make a strong resume even stronger.' },
+    linkedin:  { num: '04', title: 'LinkedIn Optimizer',
+      desc: 'Make your profile findable by recruiters searching for your skills.',
+      quote: 'Your professional story continues beyond your resume.' },
+    cover:     { num: '05', title: 'Cover Letter Generator',
+      desc: 'A letter built from your real background and this specific job.',
+      quote: 'A good application connects your experience to the opportunity.' },
+    interview: { num: '06', title: 'Mock Interview',
+      desc: 'Practice with questions built from your actual resume and target job.',
+      quote: 'Confidence grows when preparation becomes practice.' },
+    gap:       { num: '07', title: 'Career Gap Analysis',
+      desc: 'What stands between you and the role you want, and how to close it.',
+      quote: 'Knowing what to build next is part of moving forward.' },
+    recruiter: { num: '08', title: 'Recruiter View',
+      desc: 'What a recruiter notices in the first thirty seconds, including the things you would rather they did not.',
+      quote: 'See your profile the way a recruiter sees it.' },
+    tracker:   { num: '09', title: 'Job Tracker',
+      desc: 'Every application, every round, every follow-up.',
+      quote: "Every application is a step. Keep track of where you're going." },
+  },
+
+  /* Compact module header: label, title, one-line description, and
+     a short contextual quote — replaces UI.head() on the nine
+     feature screens. Look up by view name (e.g. UI.moduleHead('resume')). */
+  moduleHead(view) {
+    const m = this.MODULES[view];
+    if (!m) return '';
+    return `
+      <div class="view-head module-head">
+        <div class="eyebrow">Module ${m.num}</div>
+        <h1>${this.escape(m.title)}</h1>
+        <p class="muted">${this.escape(m.desc)}</p>
+        <p class="module-quote">${this.escape(m.quote)}</p>
+      </div>`;
+  },
+
   stat(label, value, cyan = false) {
     return `
       <div class="stat">
