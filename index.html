@@ -8,9 +8,9 @@
 </head>
 <body>
 
-  <!-- ============ SIDEBAR NAV ============ -->
-  <aside class="sidebar">
-    <div class="brand">
+  <!-- ============ TOP HEADER ============ -->
+  <header class="topbar">
+    <button class="brand brand-btn" id="homeBtn" aria-label="HirePilot — go to Home">
       <div class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M21.7 2.3 2.6 9.8c-.8.3-.8 1.5.1 1.7l6.9 1.9 1.9 6.9c.2.9 1.4.9 1.7.1l7.5-19.1c.3-.7-.4-1.4-1.1-1z" fill="currentColor"/>
@@ -20,53 +20,90 @@
         <strong>HirePilot</strong>
         <span>Plan · Prepare · Get Hired</span>
       </div>
-    </div>
+    </button>
 
-    <nav class="nav" id="nav">
-      <button class="nav-item active" data-view="dashboard">
-        <span class="nav-num">00</span> Dashboard
-      </button>
-      <button class="nav-item" data-view="resume">
-        <span class="nav-num">01</span> Resume Analyzer
-      </button>
-      <button class="nav-item" data-view="jd">
-        <span class="nav-num">02</span> JD Analyzer
-      </button>
-      <button class="nav-item" data-view="optimizer">
-        <span class="nav-num">03</span> Resume Optimizer
-      </button>
-      <button class="nav-item" data-view="linkedin">
-        <span class="nav-num">04</span> LinkedIn Optimizer
-      </button>
-      <button class="nav-item" data-view="cover">
-        <span class="nav-num">05</span> Cover Letter
-      </button>
-      <button class="nav-item" data-view="interview">
-        <span class="nav-num">06</span> Mock Interview
-      </button>
-      <button class="nav-item" data-view="gap">
-        <span class="nav-num">07</span> Career Gap
-      </button>
-      <button class="nav-item" data-view="recruiter">
-        <span class="nav-num">08</span> Recruiter View
-      </button>
-      <button class="nav-item" data-view="tracker">
-        <span class="nav-num">09</span> Job Tracker
-      </button>
-    </nav>
-
-    <div class="sidebar-foot">
-      <button class="btn-ghost" id="settingsBtn">API Settings</button>
+    <div class="topbar-right">
       <div class="status" id="apiStatus">
         <span class="dot"></span> Not connected
       </div>
+      <button class="hamburger" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-  </aside>
+  </header>
 
   <!-- ============ MAIN PANEL ============ -->
   <main class="main">
     <div id="views"></div>
   </main>
+
+  <!-- ============ NAV DRAWER ============ -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <nav class="drawer" id="drawer" aria-label="HirePilot tools" aria-hidden="true">
+    <div class="drawer-head">
+      <strong>HirePilot</strong>
+      <button class="drawer-close" id="drawerClose" aria-label="Close menu">&times;</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="drawer-group">
+        <div class="drawer-group-label">Your Resume</div>
+        <button class="drawer-item" data-view="resume">
+          <span class="di-icon" id="diResume"></span>
+          <span class="di-text"><strong>Resume Analyzer</strong><span>Understand your resume</span></span>
+        </button>
+        <button class="drawer-item" data-view="optimizer">
+          <span class="di-icon" id="diOptimizer"></span>
+          <span class="di-text"><strong>Resume Optimizer</strong><span>Improve it for the role</span></span>
+        </button>
+      </div>
+
+      <div class="drawer-group">
+        <div class="drawer-group-label">Your Application</div>
+        <button class="drawer-item" data-view="jd">
+          <span class="di-icon" id="diJd"></span>
+          <span class="di-text"><strong>JD Analyzer</strong><span>Understand the opportunity</span></span>
+        </button>
+        <button class="drawer-item" data-view="cover">
+          <span class="di-icon" id="diCover"></span>
+          <span class="di-text"><strong>Cover Letter</strong><span>Create a tailored letter</span></span>
+        </button>
+        <button class="drawer-item" data-view="linkedin">
+          <span class="di-icon" id="diLinkedin"></span>
+          <span class="di-text"><strong>LinkedIn Optimizer</strong><span>Strengthen your profile</span></span>
+        </button>
+      </div>
+
+      <div class="drawer-group">
+        <div class="drawer-group-label">Prepare</div>
+        <button class="drawer-item" data-view="interview">
+          <span class="di-icon" id="diInterview"></span>
+          <span class="di-text"><strong>Mock Interview</strong><span>Practice before the real thing</span></span>
+        </button>
+        <button class="drawer-item" data-view="gap">
+          <span class="di-icon" id="diGap"></span>
+          <span class="di-text"><strong>Career Gap</strong><span>Find skills to build</span></span>
+        </button>
+        <button class="drawer-item" data-view="recruiter">
+          <span class="di-icon" id="diRecruiter"></span>
+          <span class="di-text"><strong>Recruiter View</strong><span>See your profile differently</span></span>
+        </button>
+      </div>
+
+      <div class="drawer-group">
+        <div class="drawer-group-label">Track</div>
+        <button class="drawer-item" data-view="tracker">
+          <span class="di-icon" id="diTracker"></span>
+          <span class="di-text"><strong>Job Tracker</strong><span>Keep applications organized</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="drawer-foot">
+      <button class="drawer-foot-btn" id="settingsBtn">API Settings</button>
+      <button class="drawer-foot-btn" id="helpBtn">Help</button>
+    </div>
+  </nav>
 
   <!-- ============ SETTINGS MODAL ============ -->
   <div class="modal" id="settingsModal" hidden>

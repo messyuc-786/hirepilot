@@ -37,7 +37,7 @@
   --shadow-sm: 0 1px 2px rgba(15,23,42,.04);
   --shadow: 0 1px 2px rgba(15,23,42,.04), 0 12px 28px -14px rgba(15,23,42,.16);
 
-  --sidebar-w: 236px;
+  --header-h: 68px;
 }
 
 /* ---------- 2. RESET ---------- */
@@ -48,7 +48,6 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  display: flex;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
@@ -56,26 +55,30 @@ body {
 a { color: var(--blue); }
 img { display: block; max-width: 100%; }
 
-/* ---------- 3. SIDEBAR ---------- */
-.sidebar {
-  width: var(--sidebar-w);
-  flex-shrink: 0;
-  background: var(--panel);
-  border-right: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
+/* ---------- 3. TOP HEADER ----------
+   One persistent header for every screen — no permanent sidebar.
+   The full toolkit lives behind the hamburger drawer instead, so the
+   app reads as one workspace rather than a list of ten tools. */
+.topbar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 28px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 22px 20px;
-  border-bottom: 1px solid var(--line);
 }
+.brand-btn { background: none; border: none; cursor: pointer; padding: 2px; border-radius: 8px; }
+.brand-btn:hover { background: var(--panel-2); }
 
 .brand-mark {
   width: 38px; height: 38px;
@@ -88,7 +91,7 @@ img { display: block; max-width: 100%; }
 }
 .brand-mark svg { width: 19px; height: 19px; }
 
-.brand-text { display: flex; flex-direction: column; line-height: 1.25; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.25; text-align: left; }
 .brand-text strong { font-size: 16px; letter-spacing: -.2px; color: var(--navy); }
 .brand-text span {
   font-size: 10.5px;
@@ -97,50 +100,11 @@ img { display: block; max-width: 100%; }
   letter-spacing: 1px;
 }
 
-.nav { padding: 12px 10px; overflow-y: auto; flex: 1; }
-
-.nav-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  margin-bottom: 2px;
-  background: none;
-  border: none;
-  border-radius: 9px;
-  color: var(--muted);
-  font-family: var(--sans);
-  font-size: 13.5px;
-  font-weight: 500;
-  text-align: left;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-}
-
-.nav-item:hover { background: var(--panel-2); color: var(--navy); }
-
-.nav-item.active {
-  background: var(--tint);
-  color: var(--blue-dark);
-  font-weight: 600;
-  box-shadow: inset 2px 0 0 var(--blue);
-}
-
-.nav-num {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--blue);
-  opacity: .8;
-}
-.nav-item.active .nav-num { opacity: 1; }
-
-.sidebar-foot { padding: 14px; border-top: 1px solid var(--line); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
 
 .status {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--muted);
-  margin-top: 10px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -154,8 +118,151 @@ img { display: block; max-width: 100%; }
 .status.live .dot { background: var(--green); }
 .status.live { color: var(--green); }
 
+/* Hamburger — three bars that morph into an X when the drawer opens */
+.hamburger {
+  width: 42px; height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.hamburger:hover { background: var(--panel-2); }
+.hamburger span {
+  display: block;
+  width: 18px; height: 2px;
+  background: var(--navy);
+  border-radius: 2px;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ---------- 3b. NAV DRAWER ---------- */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .45);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+.drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.drawer {
+  position: fixed;
+  top: 0; right: 0;
+  width: 360px;
+  max-width: 92vw;
+  height: 100vh;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .25s ease;
+}
+.drawer.open { transform: translateX(0); }
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.drawer-head strong { font-size: 16px; color: var(--navy); }
+
+.drawer-close {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  background: var(--panel-2);
+  border: none;
+  border-radius: 9px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--navy);
+  cursor: pointer;
+}
+.drawer-close:hover { background: var(--line); }
+
+.drawer-body { flex: 1; overflow-y: auto; padding: 10px 12px; }
+
+.drawer-group { margin-bottom: 12px; }
+.drawer-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  padding: 10px 10px 6px;
+}
+
+.drawer-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 9px 10px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s;
+}
+.drawer-item:hover { background: var(--panel-2); }
+.drawer-item.active { background: var(--tint); box-shadow: inset 2px 0 0 var(--blue); }
+
+.drawer-item .di-icon {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  background: var(--tint);
+  color: var(--blue);
+  border-radius: 9px;
+}
+.drawer-item.active .di-icon { background: #fff; }
+
+.drawer-item .di-text { display: flex; flex-direction: column; line-height: 1.3; }
+.drawer-item .di-text strong { font-size: 13.5px; font-weight: 600; color: var(--navy); }
+.drawer-item .di-text span { font-size: 11.5px; color: var(--muted); }
+
+.drawer-foot {
+  flex-shrink: 0;
+  border-top: 1px solid var(--line);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.drawer-foot-btn {
+  text-align: left;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+.drawer-foot-btn:hover { background: var(--panel-2); }
+
 /* ---------- 4. MAIN AREA ---------- */
-.main { flex: 1; padding: 32px 40px 70px; max-width: 1400px; }
+.main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 70px; width: 100%; }
 
 .view-head { margin-bottom: 26px; }
 
@@ -595,14 +702,34 @@ tr:last-child td { border-bottom: none; }
 .quick-action strong { display: block; font-size: 13.5px; color: var(--navy); }
 .quick-action span { font-size: 11.5px; color: var(--muted); }
 
-/* Key stats — one panel with four columns divided by hairlines,
-   instead of four separate thin cards with padding fighting padding. */
+/* Key stats — one row of columns divided by hairlines, instead of
+   several separate thin cards with padding fighting padding.
+   .snapshot-row is the dashboard's compact 6-up variant. */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
-.stats-row > div { padding: 18px 24px; border-right: 1px solid var(--line); }
+.stats-row > div { padding: 6px 20px; border-right: 1px solid var(--line); }
+.stats-row > div:first-child { padding-left: 2px; }
 .stats-row > div:last-child { border-right: none; }
+.stats-row .stat-value { font-size: 24px; }
+
+.snapshot-row { grid-template-columns: repeat(6, 1fr); }
+
+/* "More tools" — a quiet text link, not another button competing
+   with the three primary quick actions above it. */
+.more-tools {
+  display: block;
+  margin-top: 14px;
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.more-tools:hover { color: var(--blue-dark); text-decoration: underline; }
 
 /* Progress / performance — the two score panels sharing one card,
    split by a single hairline instead of two full duplicate cards. */
@@ -658,26 +785,17 @@ tr:last-child td { border-bottom: none; }
 }
 
 @media (max-width: 900px) {
-  body { flex-direction: column; }
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: static;
-    flex-direction: row;
-    align-items: center;
-    overflow-x: auto;
-  }
-  .brand { border-bottom: none; border-right: 1px solid var(--line); }
-  .nav { display: flex; gap: 4px; padding: 10px; }
-  .nav-item { white-space: nowrap; width: auto; }
-  .nav-item.active { box-shadow: inset 0 -2px 0 var(--blue); }
-  .sidebar-foot { border-top: none; border-left: 1px solid var(--line); white-space: nowrap; }
+  .topbar { padding: 11px 16px; }
+  .brand-text span { display: none; } /* compact header on smaller screens */
   .main { padding: 22px 18px 60px; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .quick-actions { grid-template-columns: repeat(2, 1fr); }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .stats-row > div:nth-child(2) { border-right: none; }
   .stats-row > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .snapshot-row { grid-template-columns: repeat(3, 1fr); }
+  .snapshot-row > div:nth-child(3n) { border-right: none; }
+  .snapshot-row > div:not(:nth-last-child(-n+3)) { border-bottom: 1px solid var(--line); }
 
   .hero { border-radius: 16px; }
   .hero-grid { grid-template-columns: 1fr; }
@@ -697,6 +815,12 @@ tr:last-child td { border-bottom: none; }
   .stats-row > div { border-right: none !important; border-bottom: 1px solid var(--line); }
   .stats-row > div:last-child { border-bottom: none; }
   .progress-panel > div:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+  .snapshot-row { grid-template-columns: repeat(2, 1fr); }
+  .snapshot-row > div:nth-child(2n) { border-right: none; }
+  .snapshot-row > div:not(:nth-last-child(-n+2)) { border-bottom: 1px solid var(--line); }
+
+  /* Near-full-width drawer on small phones, per spec. */
+  .drawer { width: 100vw; max-width: 100vw; border-left: none; }
 }
 
 /* ---------- 15. ACCESSIBILITY ---------- */

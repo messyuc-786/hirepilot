@@ -129,6 +129,8 @@ const UI = {
     target: '<circle cx="12" cy="12" r="8" fill="none" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke-width="1.6"/><circle cx="12" cy="12" r="1.4"/>',
     chat: '<path d="M4 5h16v11H9l-4 4v-4H4Z" fill="none" stroke-width="1.6" stroke-linejoin="round"/>',
     list: '<path d="M9 6h11M9 12h11M9 18h11" stroke-width="1.6"/><circle cx="4.5" cy="6" r="1.4"/><circle cx="4.5" cy="12" r="1.4"/><circle cx="4.5" cy="18" r="1.4"/>',
+    mail: '<path d="M3 5h18v14H3Z" fill="none" stroke-width="1.6" stroke-linejoin="round"/><path d="m3 6 9 7 9-7" fill="none" stroke-width="1.6" stroke-linejoin="round"/>',
+    link: '<path d="M9.5 14.5 14.5 9.5" stroke-width="1.8"/><path d="M11 6.5 13 4.4a3.6 3.6 0 0 1 5.1 5.1L16 11.5" fill="none" stroke-width="1.8"/><path d="M13 17.5 11 19.6a3.6 3.6 0 0 1-5.1-5.1L8 12.5" fill="none" stroke-width="1.8"/>',
   },
   icon(name, size = 20) {
     const body = this._icons[name] || '';
